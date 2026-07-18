@@ -1,0 +1,301 @@
+documents:
+  - id: "VOS-DOC-001"
+    title: "Venture OS Core — Manual Operacional para Criação de Negócios Assistida por IA"
+    role: "fundação e princípios"
+    status: "Draft"
+    classification: "canonical"
+    canonical_path: "docs/canonical/system/venture-os-core-manual.md"
+    source_markdown: "docs/_converted/1-venture-os-core-manual-operacional-para-criacao-de-negocios-assistida-por-ia-v-0-1.md"
+    source_word: "1-Venture OS Core-Manual Operacional para Criação de Negócios Assistida por IA_v 0.1.docx"
+    supersedes: null
+    related_documents: ["VOS-ARC-CORE-001", "VOS-CAOM-001", "VOS-AFH-001", "VOS-ORC-001"]
+    project: null
+    notes: "Documento fundador ativo; sobreposições mantidas para consolidação futura."
+  - id: "VOS-PRO-EXP"
+    title: "Venture OS — Explorer Protocol"
+    role: "funcionamento geral do Explorer"
+    status: "Candidate"
+    classification: "canonical"
+    canonical_path: "docs/canonical/explorer/explorer-protocol.md"
+    source_markdown: "docs/_converted/2-venture-os-explorer-protocol-v-0-2.md"
+    source_word: "2-Venture OS — Explorer Protocol_v 0.2.docx"
+    supersedes: null
+    related_documents: ["VOS-PRO-EXP-001", "VOS-REA-EXP-001"]
+    project: null
+    notes: "Define o funcionamento geral do Explorer e permanece carregado no contexto do agente."
+  - id: "VOS-DOC-003"
+    title: "Venture OS — Knowledge Architecture (proposta inicial)"
+    role: "arquitetura de conhecimento inicial"
+    status: "Superseded"
+    classification: "superseded"
+    canonical_path: "docs/archive/superseded/knowledge-architecture-v0-1-initial.md"
+    source_markdown: "docs/_converted/3-venture-os-knowledge-architecture-v-0-1.md"
+    source_word: "3-Venture OS — Knowledge Architecture_v 0.1.docx"
+    supersedes: null
+    related_documents: ["VOS-KNO-CORE-001"]
+    project: null
+    notes: "Substituído pela arquitetura mais desenvolvida; contém tópicos exclusivos a rever antes de qualquer consolidação."
+  - id: "KS-0006"
+    title: "Knowledge Seed — KS-0006"
+    role: "knowledge seed de projeto"
+    status: "Draft"
+    classification: "project-specific"
+    canonical_path: "docs/canonical/projects/VOS-EXP-001/knowledge-seed-ks-0006.md"
+    source_markdown: "docs/_converted/4-knowledge-seed-ks-0006.md"
+    source_word: "4-Knowledge Seed — KS-0006.docx"
+    supersedes: null
+    related_documents: ["VOS-EXP-001", "VOS-RES-EXP-001"]
+    project: "VOS-EXP-001"
+    notes: "Registo específico do projeto; não é template genérico."
+  - id: "VOS-DOC-005"
+    title: "Venture OS — Opportunity Brief"
+    role: "opportunity brief de projeto"
+    status: "Draft"
+    classification: "project-specific"
+    canonical_path: "docs/canonical/projects/VOS-EXP-001/opportunity-brief.md"
+    source_markdown: "docs/_converted/5-venture-os-opportunity-brief-v01.md"
+    source_word: "5-Venture OS Opportunity Brief_v01.docx"
+    supersedes: null
+    related_documents: ["VOS-RES-EXP-001", "VOS-GATE-EXP-001"]
+    project: "VOS-EXP-001"
+    notes: "Instância preenchida do projeto VOS-EXP-001."
+  - id: "VOS-PRO-EXP-001"
+    title: "Explorer Validation Protocol"
+    role: "subprotocolo de validação do Explorer"
+    status: "Draft"
+    classification: "canonical"
+    canonical_path: "docs/canonical/explorer/explorer-validation-protocol.md"
+    source_markdown: "docs/_converted/6-venture-os-explorer-validation-protocol-v0-1.md"
+    source_word: "6-Venture OS-Explorer Validation Protocol_v0.1.docx"
+    supersedes: null
+    related_documents: ["VOS-PRO-EXP", "VOS-RES-EXP-001"]
+    project: null
+    notes: "Ativado quando é necessária validação, sobretudo nos modos Standard e Deep; não é carregado por defeito com o agente."
+  - id: "VOS-GATE-EXP-001"
+    title: "CEO Gate — Explorer"
+    role: "template de decisão do CEO"
+    status: "Candidate"
+    classification: "canonical"
+    canonical_path: "docs/canonical/templates/ceo-gate-explorer.md"
+    source_markdown: "docs/_converted/7-venture-os-ceo-gate-explorer-v0-1.md"
+    source_word: "7-Venture OS-CEO Gate — Explorer_V0.1.docx"
+    supersedes: null
+    related_documents: ["VOS-DEC-CORE-001", "VOS-EXP-001"]
+    project: null
+    notes: "Template reutilizável; os campos de projeto permanecem por preencher."
+  - id: "VOS-RES-EXP-001"
+    title: "Research Plan"
+    role: "plano de investigação de projeto"
+    status: "Draft"
+    classification: "project-specific"
+    canonical_path: "docs/canonical/projects/VOS-EXP-001/research-plan.md"
+    source_markdown: "docs/_converted/8-venture-os-research-plan-v0-1.md"
+    source_word: "8-Venture OS - Research Plan_v0.1.docx"
+    supersedes: null
+    related_documents: ["VOS-PRO-EXP-001", "VOS-INT-EXP-001", "VOS-EVR-EXP-001"]
+    project: "VOS-EXP-001"
+    notes: "Plano preenchido para VOS-EXP-001, não template genérico."
+  - id: "VOS-INT-EXP-001"
+    title: "Interview Guide"
+    role: "guia operacional de entrevistas do Explorer"
+    status: "Candidate"
+    classification: "canonical"
+    canonical_path: "docs/canonical/explorer/interview-guide.md"
+    source_markdown: "docs/_converted/9-venture-os-interview-guide-v0-1.md"
+    source_word: "9-Venture OS - Interview Guide_v0.1.docx"
+    supersedes: null
+    related_documents: ["VOS-RES-EXP-001", "VOS-PRO-EXP-001", "VOS-RPS-EXP-001"]
+    project: null
+    notes: "Mantido como documento específico do Explorer na v0.1; pode conter referências ao projeto piloto."
+  - id: "VOS-EVR-EXP-001"
+    title: "Evidence Register"
+    role: "registo e controlo de evidência do Explorer"
+    status: "Candidate"
+    classification: "canonical"
+    canonical_path: "docs/canonical/explorer/evidence-register.md"
+    source_markdown: "docs/_converted/10-venture-os-evidence-register-v0-1.md"
+    source_word: "10-Venture OS - Evidence Register_v0.1.docx"
+    supersedes: null
+    related_documents: ["VOS-RES-EXP-001", "VOS-INT-EXP-001", "VOS-GATE-EXP-001"]
+    project: null
+    notes: "Mantido como documento específico do Explorer na v0.1; pode conter referências ao projeto piloto."
+  - id: "VOS-RPS-EXP-001-DUP"
+    title: "Research Participant System (duplicado)"
+    role: "cópia integral duplicada"
+    status: "Duplicate"
+    classification: "duplicate"
+    canonical_path: "docs/archive/duplicates/research-participant-system-v0-duplicate.md"
+    source_markdown: "docs/_converted/11-venture-os-research-participant-system-v-0.md"
+    source_word: "11-Venture OS - Research Participant System_v.0.docx"
+    supersedes: null
+    related_documents: ["VOS-RPS-EXP-001"]
+    project: null
+    notes: "Conteúdo integralmente idêntico à cópia canónica proveniente do documento 18."
+  - id: "VOS-ARC-CORE-001"
+    title: "Global Architecture"
+    role: "arquitetura de referência"
+    status: "Reference"
+    classification: "reference"
+    canonical_path: "docs/reference/global-architecture.md"
+    source_markdown: "docs/_converted/12-venture-os-global-architecture-v-01.md"
+    source_word: "12-Venture OS - Global Architecture_v-01.docx"
+    supersedes: null
+    related_documents: ["VOS-GOV-CORE-001", "VOS-KNO-CORE-001", "VOS-CAOM-001"]
+    project: null
+    notes: "Arquitetura organizacional útil, mas não requisito operacional direto da v0.1."
+  - id: "VOS-GOV-CORE-001"
+    title: "Governance Charter"
+    role: "governação e autoridade"
+    status: "Candidate"
+    classification: "canonical"
+    canonical_path: "docs/canonical/system/governance-charter.md"
+    source_markdown: "docs/_converted/13-venture-os-governance-charter-v-01.md"
+    source_word: "13-Venture OS Governance Charter_v.01.docx"
+    supersedes: null
+    related_documents: ["VOS-ARC-CORE-001", "VOS-DEC-CORE-001"]
+    project: null
+    notes: "Regras ativas de autoridade e controlo da versão 0.1."
+  - id: "VOS-KNO-CORE-001"
+    title: "Knowledge Architecture"
+    role: "arquitetura de conhecimento de referência"
+    status: "Reference"
+    classification: "reference"
+    canonical_path: "docs/reference/knowledge-architecture.md"
+    source_markdown: "docs/_converted/14-venture-os-knowledge-architecture-v-01.md"
+    source_word: "14-Venture OS - Knowledge Architecture_v.01.docx"
+    supersedes: "VOS-DOC-003"
+    related_documents: ["VOS-ARC-CORE-001", "VOS-GOV-CORE-001"]
+    project: null
+    notes: "Substitui a proposta inicial 3; classificada como referência por ser mais abstrata do que o núcleo executável."
+  - id: "VOS-DEC-CORE-001"
+    title: "Decision Protocol"
+    role: "protocolo operacional de decisão"
+    status: "Candidate"
+    classification: "canonical"
+    canonical_path: "docs/canonical/operations/decision-protocol.md"
+    source_markdown: "docs/_converted/15-venture-os-decision-protocol-v-01.md"
+    source_word: "15-Venture OS - Decision Protocol_v.01.docx"
+    supersedes: null
+    related_documents: ["VOS-GOV-CORE-001", "VOS-GATE-EXP-001"]
+    project: null
+    notes: "Norma operacional para decisões e gates."
+  - id: "VOS-REA-CORE-001"
+    title: "Reasoning Framework"
+    role: "framework de raciocínio de referência"
+    status: "Reference"
+    classification: "reference"
+    canonical_path: "docs/reference/reasoning-framework.md"
+    source_markdown: "docs/_converted/16-venture-os-reasoning-framework-v-01.md"
+    source_word: "16-Venture OS - Reasoning Framework_v.01.docx"
+    supersedes: null
+    related_documents: ["VOS-DEC-CORE-001", "VOS-REA-EXP-001"]
+    project: null
+    notes: "Princípios transversais úteis; a execução do Explorer está no motor especializado."
+  - id: "VOS-REA-EXP-001"
+    title: "Explorer Reasoning Engine"
+    role: "motor operacional de raciocínio do Explorer"
+    status: "Candidate"
+    classification: "canonical"
+    canonical_path: "docs/canonical/explorer/explorer-reasoning-engine.md"
+    source_markdown: "docs/_converted/17-venture-os-explorer-reasoning-engine-v-01.md"
+    source_word: "17-Venture OS - Explorer Reasoning Engine_v.01.docx"
+    supersedes: null
+    related_documents: ["VOS-REA-CORE-001", "VOS-PRO-EXP-001"]
+    project: null
+    notes: "Especialização operacional do raciocínio para o Explorer."
+  - id: "VOS-RPS-EXP-001"
+    title: "Research Participant System"
+    role: "sistema operacional de participantes"
+    status: "Candidate"
+    classification: "canonical"
+    canonical_path: "docs/canonical/explorer/research-participant-system.md"
+    source_markdown: "docs/_converted/18-venture-os-research-participant-system-v-01.md"
+    source_word: "18-Venture OS - Research Participant System_v.01.docx"
+    supersedes: null
+    related_documents: ["VOS-RPS-EXP-001-DUP", "VOS-INT-EXP-001", "VOS-EVR-EXP-001"]
+    project: null
+    notes: "Cópia canónica escolhida por ter nome de versão coerente; conteúdo idêntico ao documento 11."
+  - id: "VOS-ED-EXP-001"
+    title: "Explorer Dashboard v0.1"
+    role: "vista executiva do Explorer"
+    status: "Draft"
+    classification: "canonical"
+    canonical_path: "docs/canonical/explorer/explorer-dashboard.md"
+    source_markdown: "docs/_converted/19-venture-os-explorer-dashboard-v0-1-v-01.md"
+    source_word: "19-Venture OS - Explorer Dashboard v0.1_v.01.docx"
+    supersedes: null
+    related_documents: ["VOS-EVR-EXP-001", "VOS-GATE-EXP-001"]
+    project: null
+    notes: "Ativo para v0.1 apesar do estado interno Draft; exige revisão das tabelas e campos de data."
+  - id: "VOS-CAOM-001"
+    title: "Common Agent Operating Model v0.1"
+    role: "funcionamento operacional comum dos agentes"
+    status: "Draft"
+    classification: "canonical"
+    canonical_path: "docs/canonical/operations/common-agent-operating-model.md"
+    source_markdown: "docs/_converted/20-venture-os-common-agent-operating-model-v0-1.md"
+    source_word: "20-Venture OS - Common Agent Operating Model_v0.1.docx"
+    supersedes: null
+    related_documents: ["VOS-AFH-001", "VOS-ORC-001", "VOS-ARC-CORE-001"]
+    project: null
+    notes: "Define o modelo comum; não foi fundido com o handbook ou a arquitetura."
+  - id: "VOS-SCOPE-001"
+    title: "v0.1 Scope and Completion Map"
+    role: "âmbito e critérios de conclusão da v0.1"
+    status: "Draft"
+    classification: "canonical"
+    canonical_path: "docs/canonical/system/v0-1-scope-and-completion-map.md"
+    source_markdown: "docs/_converted/21-venture-os-v0-1-scope-and-completion-map-v-01.md"
+    source_word: "21.Venture OS - v0.1 Scope and Completion Map_v.01.docx"
+    supersedes: null
+    related_documents: ["VOS-AFH-001", "VOS-COT-001", "VOS-ORC-001"]
+    project: null
+    notes: "Documento essencial de controlo do âmbito da versão 0.1."
+  - id: "VOS-AFH-001"
+    title: "Agent Function Handbook v0.1"
+    role: "manual operacional das funções dos agentes"
+    status: "Draft"
+    classification: "canonical"
+    canonical_path: "docs/canonical/operations/agent-function-handbook.md"
+    source_markdown: "docs/_converted/22-venture-os-agent-function-handbook-v0-1.md"
+    source_word: "22-Venture OS - Agent Function Handbook_v0.1.docx"
+    supersedes: null
+    related_documents: ["VOS-CAOM-001", "VOS-ORC-001"]
+    project: null
+    notes: "Documento essencial; descreve funções, inputs, outputs e limites."
+  - id: "VOS-VPR-001"
+    title: "Venture Project Record v0.1"
+    role: "template de registo vivo de projeto"
+    status: "Draft"
+    classification: "canonical"
+    canonical_path: "docs/canonical/templates/venture-project-record.md"
+    source_markdown: "docs/_converted/23-venture-os-venture-project-record-v0-1.md"
+    source_word: "23-Venture OS - Venture Project Record_v0.1.docx"
+    supersedes: null
+    related_documents: ["VOS-ORC-001", "VOS-COT-001"]
+    project: null
+    notes: "Template essencial para o estado documental de cada projeto."
+  - id: "VOS-ORC-001"
+    title: "Venture OS Orchestrator v0.1"
+    role: "coordenação e routing"
+    status: "Draft"
+    classification: "canonical"
+    canonical_path: "docs/canonical/operations/venture-os-orchestrator.md"
+    source_markdown: "docs/_converted/24-venture-os-venture-os-orchestrator-v0-1.md"
+    source_word: "24-Venture OS -Venture OS Orchestrator_v0.1.docx"
+    supersedes: null
+    related_documents: ["VOS-CAOM-001", "VOS-AFH-001", "VOS-VPR-001"]
+    project: null
+    notes: "Define coordenação documental e routing; não constitui implementação de software."
+  - id: "VOS-COT-001"
+    title: "Core Output Templates v0.1"
+    role: "catálogo de templates operacionais"
+    status: "Draft"
+    classification: "canonical"
+    canonical_path: "docs/canonical/templates/core-output-templates.md"
+    source_markdown: "docs/_converted/25-venture-os-core-output-templates-v0-1.md"
+    source_word: "25-Venture OS - Core Output Templates_v0.1.docx"
+    supersedes: null
+    related_documents: ["VOS-VPR-001", "VOS-AFH-001"]
+    project: null
+    notes: "Documento essencial; mantém os templates agrupados nesta etapa."

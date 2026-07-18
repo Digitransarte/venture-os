@@ -1,0 +1,56 @@
+# Documentation loading policy for the future Venture OS application.
+# Paths are repository-relative and point only to classified copies.
+
+always:
+  - docs/canonical/system/v0-1-scope-and-completion-map.md
+  - docs/canonical/operations/agent-function-handbook.md
+  - docs/canonical/operations/venture-os-orchestrator.md
+  - docs/canonical/templates/venture-project-record.md
+
+by_agent:
+  explorer:
+    - docs/canonical/explorer/explorer-protocol.md
+    - docs/canonical/explorer/explorer-reasoning-engine.md
+    - docs/canonical/explorer/interview-guide.md
+    - docs/canonical/explorer/evidence-register.md
+    - docs/canonical/explorer/research-participant-system.md
+    - docs/canonical/explorer/explorer-dashboard.md
+  strategist: []
+  designer: []
+  builder: []
+  growth: []
+  archivist: []
+
+by_task:
+  validation:
+    - docs/canonical/explorer/explorer-validation-protocol.md
+  decision:
+    - docs/canonical/templates/ceo-gate-explorer.md
+    - docs/canonical/system/governance-charter.md
+    - docs/canonical/operations/decision-protocol.md
+  output_generation:
+    - docs/canonical/templates/core-output-templates.md
+  project_update:
+    - docs/canonical/templates/venture-project-record.md
+
+by_mode:
+  quick: []
+  standard:
+    - docs/canonical/explorer/explorer-validation-protocol.md
+  deep:
+    - docs/canonical/explorer/explorer-validation-protocol.md
+
+project_specific:
+  VOS-EXP-001:
+    - docs/canonical/projects/VOS-EXP-001/knowledge-seed-ks-0006.md
+    - docs/canonical/projects/VOS-EXP-001/opportunity-brief.md
+    - docs/canonical/projects/VOS-EXP-001/research-plan.md
+
+reference_only:
+  - docs/reference/global-architecture.md
+  - docs/reference/knowledge-architecture.md
+  - docs/reference/reasoning-framework.md
+
+excluded:
+  - docs/archive/duplicates/research-participant-system-v0-duplicate.md
+  - docs/archive/superseded/knowledge-architecture-v0-1-initial.md
