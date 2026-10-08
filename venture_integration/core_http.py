@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 from typing import Any
+from . import SNAPSHOT_KIND, fingerprint, validate
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import (
@@ -16,7 +17,11 @@ from urllib.request import (
 
 
 class CoreTransportError(RuntimeError):
-    """HTTP transport failed (message deliberately excludes tokens and body)."""
+    """HTTP transport error; messages exclude credentials and response bodies."""
+
+    def __init__(self, message: str, status_code: int | None = None):
+        super().__init__(message)
+        self.status_code = status_code
 
 
 class _NoRedirect(HTTPRedirectHandler):
@@ -61,7 +66,7 @@ class CoreMemoryHttpAdapter:
             with self._opener.open(request, timeout=self._timeout) as response:
                 return json.loads(response.read().decode("utf-8"))
         except HTTPError as err:
-            raise CoreTransportError(f"Core API returned HTTP {err.code}") from None
+            raise CoreTransportError(f"Core API returned HTTP {err.code}", status_code=err.code) from None
         except URLError:
             raise CoreTransportError("Core API unavailable") from None
         except (UnicodeError, json.JSONDecodeError):
@@ -78,6 +83,8 @@ class CoreMemoryHttpAdapter:
         return value
 
     def add_memory(self, entry: dict) -> dict:
+        if entry.get("kind") == SNAPSHOT_KIND:
+            raise CoreTransportError("Versioned snapshots require append_atomic")
         payload = {field: entry[field] for field in ("title", "kind", "content", "tags") if field in entry}
         value = self._request("POST", self._memory_path(), payload)
         if not isinstance(value, dict) or not value.get("id"):
@@ -88,4 +95,56 @@ class CoreMemoryHttpAdapter:
         value = self._request("GET", "/v1/projects/" + quote(self.project_slug, safe=""))
         if not isinstance(value, dict) or value.get("slug") != self.project_slug:
             raise CoreTransportError("Core Project mismatch")
+        return value
+
+    def get_latest(self, venture_ref: str) -> dict | None:
+        """Read the authoritative Core revision. Return None only on 404."""
+        endpoint = ("/v1/projects/" + quote(self.project_slug, safe="")
+                    + "/venture-records/" + quote(venture_ref, safe=""))
+        try:
+            value = self._request("GET", endpoint)
+        except CoreTransportError as exc:
+            if exc.status_code == 404:
+                return None
+            raise
+        if not isinstance(value, dict) or value.get("revision", 0) < 1:
+            raise CoreTransportError("Core returned invalid Venture Record")
+        if not isinstance(value.get("record"), dict):
+            raise CoreTransportError("Core returned invalid Venture content")
+        if value.get("digest") != fingerprint(value["record"]):
+            raise CoreTransportError("Core Venture Record hash mismatch")
+        return value
+
+    def append_atomic(
+        self, record: dict, *, expected_revision: int, expected_digest: str | None
+    ) -> dict:
+        """Use the new Core transactional compare-and-swap endpoint.
+
+        No request is made when validation or tenant binding fails.
+        Conflict responses (409) must be handled by refreshing latest state.
+        """
+        obj = validate(record)
+        if obj["core_project_slug"] != self.project_slug:
+            raise CoreTransportError("Cross-project Venture Record write refused")
+        if type(expected_revision) is not int or expected_revision < 0:
+            raise CoreTransportError("Invalid expected_revision")
+        if expected_revision == 0 and expected_digest is not None:
+            raise CoreTransportError("First revision cannot have predecessor")
+        if expected_revision > 0 and (
+            not isinstance(expected_digest, str)
+            or len(expected_digest) != 64
+            or any(ch not in "0123456789abcdef" for ch in expected_digest)
+        ):
+            raise CoreTransportError("Expected predecessor digest required")
+        endpoint = ("/v1/projects/" + quote(self.project_slug, safe="")
+                    + "/venture-records/" + quote(obj["venture_ref"], safe="")
+                    + "/revisions")
+        value = self._request("POST", endpoint, {
+            "record": obj, "expected_revision": expected_revision,
+            "expected_digest": expected_digest,
+        })
+        if not isinstance(value, dict) or value.get("digest") != fingerprint(obj):
+            raise CoreTransportError("Core did not confirm matching Venture Record")
+        if value.get("status") not in {"created", "unchanged"} or not value.get("memory_id"):
+            raise CoreTransportError("Core did not confirm a valid journal revision")
         return value
