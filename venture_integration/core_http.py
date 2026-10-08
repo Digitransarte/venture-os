@@ -74,24 +74,13 @@ class CoreMemoryHttpAdapter:
         except (UnicodeError, json.JSONDecodeError):
             raise CoreTransportError("Core API returned invalid JSON") from None
 
-    def _memory_path(self) -> str:
-        return "/v1/projects/" + quote(self.project_slug, safe="") + "/memory"
-
     def list_memory(self, kind: str, ref: str) -> list[dict]:
-        query = urlencode({"kind": kind, "q": ref, "limit": 500})
-        value = self._request("GET", self._memory_path() + "?" + query)
-        if not isinstance(value, list):
-            raise CoreTransportError("Core Memory list has unexpected format")
-        return value
+        """Legacy memory listing is not available to scoped Venture principals."""
+        raise CoreTransportError("Use get_latest for scoped Venture snapshots")
 
     def add_memory(self, entry: dict) -> dict:
-        if entry.get("kind") == SNAPSHOT_KIND:
-            raise CoreTransportError("Versioned snapshots require append_atomic")
-        payload = {field: entry[field] for field in ("title", "kind", "content", "tags") if field in entry}
-        value = self._request("POST", self._memory_path(), payload)
-        if not isinstance(value, dict) or not value.get("id"):
-            raise CoreTransportError("Core did not confirm Memory ID")
-        return value
+        """Never fall back to the unversioned Core Memory write endpoint."""
+        raise CoreTransportError("Use append_atomic for all Venture revisions")
 
     def get_project(self) -> dict:
         """Verify access to this project via the narrowly scoped Venture API.
