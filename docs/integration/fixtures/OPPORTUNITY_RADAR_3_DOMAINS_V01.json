@@ -1,0 +1,139 @@
+{
+  "schema_version": "discovery_quick.v0.1",
+  "scope": "Exploratory internal business discovery, not a business launch",
+  "opportunities": [
+    {
+      "opportunity_ref": "VOS-OPP-WEB-001",
+      "title": "Designeo · Kits WordPress originais + serviço de implementação",
+      "vertical": "design-web",
+      "buyer_hypothesis": "Pequenas empresas e profissionais que querem iniciar ou renovar um website",
+      "problem_hypothesis": "Clientes necessitam de websites de boa qualidade e implementação acessível, sem projetos excessivamente demorados.",
+      "offer_hypothesis": "Kit WordPress original reutilizável, incluindo design system, páginas e componentes, disponível para venda digital ou implementação personalizada.",
+      "revenue_model_hypothesis": "Venda de template; serviço de implementação e personalização; manutenção recorrente opcional",
+      "channel_hypothesis": "Site próprio da Designeo, portefólio e eventualmente marketplaces de templates e serviços freelance",
+      "existing_capabilities": [
+        "WordPress / Elementor Pro",
+        "Design Agent e DesignOS",
+        "Figma e criação de identidades",
+        "Desenvolvimento de websites para clientes"
+      ],
+      "assumptions": [
+        "Existe um nicho disposto a pagar por um kit mais especializado",
+        "Um kit reutilizável reduz horas de trabalho sem degradar qualidade",
+        "As licenças permitem revenda dos componentes incluídos"
+      ],
+      "evidence": [
+        {
+          "type": "owner_observation",
+          "claim": "O utilizador já desenvolve marcas e websites e trabalha com WordPress e Elementor",
+          "source_ref": "owner-report:2026-10-08"
+        },
+        {
+          "type": "hypothesis",
+          "claim": "Há procura economicamente relevante para um kit WordPress próprio",
+          "source_ref": null
+        }
+      ],
+      "economics": {
+        "sale_price": null,
+        "materials_and_fulfilment": null,
+        "platform_fees": null,
+        "acquisition_cost": null,
+        "agent_cost": null,
+        "human_labour_cost": null
+      },
+      "minimum_test_proposal": "Conceber um único kit genérico original, medir esforço e apresentar oferta a compradores elegíveis mediante aprovação; medir pedidos reais, revisões e custo de aquisição."
+    },
+    {
+      "opportunity_ref": "VOS-OPP-APPAREL-001",
+      "title": "Noetic Ink · Arte autoral e T-shirts impressas",
+      "vertical": "print-apparel",
+      "buyer_hypothesis": null,
+      "problem_hypothesis": "Um segmento poderá valorizar ilustração original e impressão artesanal de qualidade em roupa.",
+      "offer_hypothesis": "Coleção curta de peças com ilustrações originais Nature Organics e produção serigrafia/DTF conforme técnica e tiragem.",
+      "revenue_model_hypothesis": "Venda direta de peças, encomendas pequenas ou licenciamento de ilustrações",
+      "channel_hypothesis": null,
+      "existing_capabilities": [
+        "Nature Organics (artes em desenvolvimento)",
+        "Screenprint OS",
+        "Equipamento próprio serigrafia e DTF",
+        "Illustration Agent",
+        "Design e Web"
+      ],
+      "assumptions": [
+        "Direitos e masters de pelo menos duas artes são elegíveis",
+        "Produção e logística preservam margem",
+        "Existe um grupo de compradores que paga por peças diferenciadas"
+      ],
+      "evidence": [
+        {
+          "type": "owner_observation",
+          "claim": "O utilizador tem capacidades de ilustração, serigrafia/DTF e produção",
+          "source_ref": "owner-report:2026-10-08"
+        },
+        {
+          "type": "owner_observation",
+          "claim": "Screenprint OS forneceu simulação de 10 DARK A4, mas exclui roupa, IVA e embalagem",
+          "source_ref": "screenprint-pricing-preview:2026-10-08"
+        },
+        {
+          "type": "unknown",
+          "claim": "Ainda não há dados de compradores, margens totais nem vendas do piloto",
+          "source_ref": null
+        }
+      ],
+      "economics": {
+        "sale_price": null,
+        "materials_and_fulfilment": null,
+        "platform_fees": null,
+        "acquisition_cost": null,
+        "agent_cost": null,
+        "human_labour_cost": null
+      },
+      "minimum_test_proposal": "Verificar duas artes e custos completos por peça; só depois definir lote mínimo e testar procura em canal autorizado, sem stock antecipado."
+    },
+    {
+      "opportunity_ref": "VOS-OPP-METAL-001",
+      "title": "Serralharia · Catálogo e orçamento de portões/vedações",
+      "vertical": "metal-fabrication",
+      "buyer_hypothesis": "Proprietários, pequenos construtores ou remodeladores que precisam de portões e vedações sob medida",
+      "problem_hypothesis": "Solicitações personalizadas de serralharia exigem medição, definição técnica e orçamento com esforço administrativo significativo.",
+      "offer_hypothesis": "Catálogo próprio de modelos configuráveis, briefing comercial e apoio à orçamentação, integrado no fabrico físico.",
+      "revenue_model_hypothesis": "Margem na venda, fabrico e instalação de componentes; melhoria de eficiência comercial",
+      "channel_hypothesis": "Website e captação de contactos locais com orçamentação supervisionada",
+      "existing_capabilities": [
+        "Experiência em fabrico de portões e vedações",
+        "CompanyOS",
+        "Engineering/CAD",
+        "Design Agent/Web",
+        "Oficina e capacidades de montagem"
+      ],
+      "assumptions": [
+        "Clientes valorizam referências visuais e cotação mais rápida",
+        "Modelos padronizados reduzem tempo sem comprometer medições nem segurança",
+        "O custo real de fabrico e instalação pode ser modelado com precisão"
+      ],
+      "evidence": [
+        {
+          "type": "owner_observation",
+          "claim": "O utilizador já produz e orçamenta produtos de serralharia e conhece processos de oficina",
+          "source_ref": "owner-report:2026-10-08"
+        },
+        {
+          "type": "hypothesis",
+          "claim": "Catálogo configurável aumenta conversão e reduz tempo de orçamentação",
+          "source_ref": null
+        }
+      ],
+      "economics": {
+        "sale_price": null,
+        "materials_and_fulfilment": null,
+        "platform_fees": null,
+        "acquisition_cost": null,
+        "agent_cost": null,
+        "human_labour_cost": null
+      },
+      "minimum_test_proposal": "Testar em 2-3 produtos reais um briefing e orçamento assistido, medir o tempo poupado, erros e revisões; quaisquer envios a clientes dependem de aprovação."
+    }
+  ]
+}
