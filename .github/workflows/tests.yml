@@ -21,3 +21,17 @@ jobs:
         run: python -m compileall -q venture_integration
       - name: Run legacy documentation and integration tests
         run: python -m unittest discover -s tests -v
+      - name: Generate internal opportunity discovery report
+        run: |
+          mkdir -p build
+          python -m venture_integration.discovery_cli --input docs/integration/fixtures/OPPORTUNITY_RADAR_3_DOMAINS_V01.json --format markdown > build/venture-opportunity-radar.md
+          python -m venture_integration.discovery_cli --input docs/integration/fixtures/OPPORTUNITY_RADAR_3_DOMAINS_V01.json --format json > build/venture-opportunity-radar.json
+          python -c 'import json; d=json.load(open("build/venture-opportunity-radar.json")); assert len(d["opportunities"])==3; assert all(not x["decision_gate"]["launch_recommended"] and x["unit_economics"]["contribution_after_variable_and_human_costs"] is None for x in d["opportunities"]); print("3 domain reports: PASS")'
+      - name: Attach candidate opportunity report
+        uses: actions/upload-artifact@v4
+        with:
+          name: venture-discovery-quick-candidate
+          path: |
+            build/venture-opportunity-radar.md
+            build/venture-opportunity-radar.json
+          retention-days: 14
