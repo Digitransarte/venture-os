@@ -58,3 +58,19 @@ Não dar como garantido que reexecutar o Builder reconstrói a versão antiga: p
 Abrir [Core PR #30](https://github.com/Digitransarte/designeo-os/pull/30), ler o comentário de revisão, reconciliar com a `main` atual e confirmar CI; só então realizar o merge pela UI, se aprovado. A seguir, seguir o [Runbook de release v0.4](RELEASE_RUNBOOK_V04.md), **com os ajustes de rollback acima**.
 
 A biblioteca [Venture OS](https://github.com/Digitransarte/venture-os) está integrada em `main` mas não disponibilizada como serviço. A capacidade de Discovery permanece utilizável via código/CLI em ambiente de desenvolvimento, sem clientes externos.
+
+## 6. Atualização após restabelecer Remote Desktop (2026-10-08)
+
+**Backup e ensaio de restauro local: PASS.** Foi produzido um `pg_dump` em formato custom, guardado com permissões restritas no servidor; a leitura do arquivo e o restauro integral numa instância PostgreSQL 17 temporária, sem ligação à rede, concluíram sem erros. Verificaram-se 10 tabelas na origem e 10 no destino. O contentor temporário foi eliminado, sem alterar a base original. **Ainda não existe aqui prova de backup fora do servidor.** Não incluir ficheiros da BD ou credenciais em GitHub/CI.
+
+**Situação real do checkout:** o servidor mudou entretanto para `main` local em `820aa040...`, com working tree limpa. A `main` publicada no GitHub era `be4f677b...` na verificação. O checkout do servidor tem **37 commits locais adicionais**, incluindo trabalho de Control Board e Illustration Agent. A comparação por nomes mostra **4 ficheiros sobrepostos** com a PR Core #30: `app/config.py`, `app/main.py`, `app/mcp_server.py` e `tests/test_mcp_discovery.py`.
+
+Por isso, a hipótese anterior de uma integração sem conflitos relevantes deixou de ser válida. É necessário:
+1. Preservar e rever todos os commits locais do servidor sem eliminar trabalho em curso.
+2. Reconciliar o trabalho do Core, Control Board e Illustration Agent numa branch de integração sujeita a review.
+3. Voltar a executar testes do Core, CI Docker, isolamento por projeto e E2E SQLite/PostgreSQL no estado reconciliado.
+4. Só depois rever o merge da PR #30 na UI autorizada, respeitando o bloqueio prévio do conector.
+5. Confirmar backup externo e rollback de aplicação independente de `git pull main` antes do deploy.
+
+**Estado do Gate:** código Venture OS integrado, Core candidate CI historicamente verde, restore local confirmado, mas **merge e deploy suspensos** por divergência significativa do repositório do servidor. Não ativar Venture OS nem alterar projetos clientes.
+
