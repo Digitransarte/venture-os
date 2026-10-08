@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 from typing import Any
-from . import SNAPSHOT_KIND, fingerprint, validate
+from . import KIND as SNAPSHOT_KIND, fingerprint, validate
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import (
