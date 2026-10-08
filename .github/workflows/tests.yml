@@ -1,0 +1,45 @@
+name: Venture OS checks
+
+on:
+  push:
+    branches: ["main", "integration/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile adapter
+        run: python -m compileall -q venture_integration
+      - name: Run legacy documentation and integration tests
+        run: python -m unittest discover -s tests -v
+      - name: Generate internal opportunity discovery report
+        run: |
+          mkdir -p build
+          python -m venture_integration.discovery_cli --input docs/integration/fixtures/OPPORTUNITY_RADAR_3_DOMAINS_V01.json --format markdown > build/venture-opportunity-radar.md
+          python -m venture_integration.discovery_cli --input docs/integration/fixtures/OPPORTUNITY_RADAR_3_DOMAINS_V01.json --format json > build/venture-opportunity-radar.json
+          python -c 'import json; d=json.load(open("build/venture-opportunity-radar.json")); assert len(d["opportunities"])==3; assert all(not x["decision_gate"]["launch_recommended"] and x["unit_economics"]["contribution_after_variable_and_human_costs"] is None for x in d["opportunities"]); print("3 domain reports: PASS")'
+      - name: Prepare three candidate specialist handoffs without Core writes
+        run: |
+          mkdir -p build/handoffs
+          for ref in VOS-OPP-WEB-001 VOS-OPP-APPAREL-001 VOS-OPP-METAL-001; do
+            python -m venture_integration.workflow_cli --input docs/integration/fixtures/OPPORTUNITY_RADAR_3_DOMAINS_V01.json --opportunity-ref "$ref" --project-slug designeo > "build/handoffs/$ref.json"
+          done
+          python -c 'import json,glob; x=[json.load(open(p)) for p in glob.glob("build/handoffs/*.json")]; assert len(x)==3 and all(y["status"]=="prepared_not_persisted" and not y["write_authorized"] and y["handoff"]["status"]=="prepared_not_executed" and not y["external_action_authorized"] for y in x); print("3 candidate handoffs: PASS")'
+      - name: Attach candidate opportunity report
+        uses: actions/upload-artifact@v4
+        with:
+          name: venture-discovery-quick-candidate
+          path: |
+            build/venture-opportunity-radar.md
+            build/venture-opportunity-radar.json
+            build/handoffs/*.json
+          retention-days: 14

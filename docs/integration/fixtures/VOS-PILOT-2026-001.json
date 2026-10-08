@@ -1,0 +1,79 @@
+{
+  "schema_version": "venture_record.v0.1-candidate",
+  "venture_ref": "VOS-PILOT-2026-001",
+  "name": "Noetic Ink — Nature Organics",
+  "core_project_slug": "designeo",
+  "dedicated_core_project_created": false,
+  "verticals": [
+    "design-illustration",
+    "screenprint-dtf",
+    "web-ecommerce"
+  ],
+  "classification": "internal_venture_pilot_candidate",
+  "stage": "exploring",
+  "depth": "standard",
+  "problem_hypothesis": "Existe um segmento que valoriza t-shirts com ilustração autoral e impressão de qualidade suficientemente para justificar preço superior ao vestuário gráfico genérico.",
+  "purchaser_segment": null,
+  "value_proposition_hypothesis": "Coleção reduzida com arte autoral e qualidade de impressão comprovada.",
+  "alternative_models": [
+    "limited_dtc_collection",
+    "artwork_licensing",
+    "customisation_service"
+  ],
+  "evidence": [
+    {
+      "id": "EV-001",
+      "classification": "reported_observation",
+      "source_type": "owner_report",
+      "claim": "Existem ilustrações desenvolvidas para Nature Organics e equipamento/capacidade de serigrafia/DTF.",
+      "independent_market_validation": false
+    },
+    {
+      "id": "EV-002",
+      "classification": "unknown",
+      "source_type": null,
+      "claim": "Procura, conversão, disposição a pagar e margem ainda não validadas.",
+      "independent_market_validation": false
+    }
+  ],
+  "assumptions": [
+    "Direitos de utilização comercial dos assets disponíveis ainda por verificar",
+    "Técnica e custo por SKU ainda por validar",
+    "Canal de aquisição/entrega ainda indefinido"
+  ],
+  "experiment": {
+    "id": "EX-001",
+    "status": "not_authorized",
+    "question": "Um pequeno segmento compra peças premium desta linha com margem de contribuição suficiente?",
+    "minimum_preparation": [
+      "inventariar duas artes e direitos",
+      "calcular custos serigrafia vs DTF",
+      "rever QA e canais de venda"
+    ],
+    "success_criteria": "A definir com dados reais e aprovação CEO",
+    "external_outreach_approved": false,
+    "launch_approved": false
+  },
+  "economics": {
+    "revenue": null,
+    "material_cost": null,
+    "print_cost": null,
+    "packaging_cost": null,
+    "distribution_cost": null,
+    "platform_fees": null,
+    "ai_cost": null,
+    "human_hours": null,
+    "contribution_margin": null,
+    "currency": "EUR"
+  },
+  "gate": {
+    "name": "Explorer / preparacao de teste",
+    "status": "pending",
+    "recommendation": "Preparar protótipo e cálculo de custos; não produzir nem publicar ainda.",
+    "ceo_decision": null
+  },
+  "next_action": "Selecionar duas artes originais Nature Organics e obter custo completo por peça usando dados do Screenprint OS.",
+  "canonical_doc": "docs/integration/PILOT_2026_001_NOETIC_INK.md",
+  "data_owner": "Venture OS via Designeo OS Core; dados de produção continuam no Screenprint OS",
+  "last_review_date": "2026-10-08"
+}
