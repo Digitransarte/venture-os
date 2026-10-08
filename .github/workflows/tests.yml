@@ -1,0 +1,23 @@
+name: Venture OS checks
+
+on:
+  push:
+    branches: ["main", "integration/**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile adapter
+        run: python -m compileall -q venture_integration
+      - name: Run legacy documentation and integration tests
+        run: python -m unittest discover -s tests -v
