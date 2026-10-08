@@ -13,6 +13,14 @@
 - Server target: Designeo Core production, `/opt/designeo-os` with Docker Compose; production deploy is controlled by the existing Builder, **not triggered by the repository CI**. This assumption must be checked against any external CD/webhooks at the time of release.
 - Venture OS app registry entry exists but is inactive; no dedicated Venture runtime/website is deployed.
 
+## Observed hold — 2026-10-08
+
+**DO NOT DEPLOY:** Core PR #30 is still open and its merge via the connected tool was blocked by security checks. Current `main` gained three Illustration Agent/Control Surface commits since the Core PR fork. Last observed server checkout HEAD is `424b03903828cfa9a1f9843a27ed40e99b4f56ce`, not resolved by the GitHub compare endpoint. Core 0.7.2 health returned HTTP 200; no live changes were made. A verified PostgreSQL backup **and disposable restore test** have not yet been shown.
+
+**Important rollback correction:** the restricted Builder checks out its registered branch and runs `git pull --ff-only` before rebuilding. It cannot select an older commit through the normal deployment request; do not represent redeploying `main` as rollback. Arrange an authorized rollback of application image/code, with an exact known-good reference, ahead of deployment.
+
+See [predeploy readiness audit](PREDEPLOY_READINESS_2026-10-08.md) and [Core PR #30](https://github.com/Digitransarte/designeo-os/pull/30) review notes.
+
 ## 1. Hard prerequisites before any server rollout
 
 1. Human reviewer examines PR #30 changes, access control, migration boundary, application impact and latest green CI against exact head. Check merge is performed from authorized GitHub UI; note merge SHA. No forced bypass.
@@ -45,7 +53,7 @@ H. Only then exercise controlled Discovery Quick to create and read a real inter
 
 Stop immediately if any of these occurs: unexpected production container restart/error; prior Core endpoint regression; authentication or project scope failure; test admin credentials accepted by Venture routes; unsupported schema; missing source record; a non-atomic writer; test writes targeting a real customer or wrong Core project; unverifiable backup/restore; any unapproved external action.
 
-Rollback only via the approved deployment procedure, restoring the prior known-good Docker image/code without dropping or rewriting existing database tables. This release introduces no new tables, but candidate snapshots may persist if controlled smoke tests were performed; retain them for forensic audit or archive explicitly, **never delete historical memory automatically**. If Core schema is later changed independently, reassess rollback compatibility.
+Rollback only via an explicitly documented, separately tested application-image/code recovery plan with an exact known-good reference; the existing Builder tracks the latest registered branch, **not an arbitrary historical SHA**. Do not drop or rewrite existing database tables. This release introduces no new tables, but candidate snapshots may persist if controlled smoke tests were performed; retain them for forensic audit or archive explicitly, **never delete historical memory automatically**. If Core schema is later changed independently, reassess rollback compatibility.
 
 ## 4. Post-activation sign-off
 
