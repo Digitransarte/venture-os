@@ -46,43 +46,13 @@ class CoreHttpAdapterTests(unittest.TestCase):
                 api_token="", project_slug="designeo",
             )
 
-    def test_read_uses_scoped_kind_and_ref(self):
+    def test_unversioned_memory_paths_are_closed_even_for_notes(self):
         adapter = self.make_adapter()
-        requests = []
-
-        def opener(request, timeout):
-            requests.append(request)
-            return Response([{"id": "m1", "kind": "venture_record_snapshot_v01",
-                              "content": "{}"}])
-
-        adapter._opener = Mock(open=opener)
-        result = adapter.list_memory("venture_record_snapshot_v01", "VOS-PILOT-2026-001")
-        self.assertEqual(result[0]["id"], "m1")
-        self.assertIn("kind=venture_record_snapshot_v01", requests[0].full_url)
-        self.assertIn("q=VOS-PILOT-2026-001", requests[0].full_url)
-        self.assertEqual(requests[0].get_method(), "GET")
-        self.assertEqual(requests[0].get_header("Authorization"), "Bearer TEST_ONLY_SECRET")
-
-    def test_write_is_explicit_and_scoped_to_project(self):
-        adapter = self.make_adapter()
-        requests = []
-
-        def opener(request, timeout):
-            requests.append(request)
-            return Response({"id": "new-id", "kind": "note"})
-
-        adapter._opener = Mock(open=opener)
-        result = adapter.add_memory({
-            "title": "ordinary note", "kind": "note",
-            "content": "test", "tags": ["venture-os"], "unexpected": "ignored"
-        })
-        self.assertEqual(result["id"], "new-id")
-        request = requests[0]
-        self.assertEqual(request.get_method(), "POST")
-        self.assertTrue(request.full_url.endswith("/v1/projects/designeo/memory"))
-        data = json.loads(request.data.decode("utf-8"))
-        self.assertNotIn("unexpected", data)
-        self.assertNotIn("TEST_ONLY_SECRET", request.data.decode("utf-8"))
+        adapter._opener = Mock(open=lambda request, timeout: self.fail("Network must not run"))
+        with self.assertRaises(CoreTransportError):
+            adapter.list_memory("venture_record_snapshot_v01", "VOS-PILOT-2026-001")
+        with self.assertRaises(CoreTransportError):
+            adapter.add_memory({"kind": "note", "content": "test"})
 
     def test_unversioned_snapshot_write_is_blocked(self):
         adapter = self.make_adapter()
