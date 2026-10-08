@@ -30,7 +30,7 @@ class DiscoveryWorkflowTests(unittest.TestCase):
         cls.opportunities = json.loads(FIXTURE.read_text(encoding="utf-8"))["opportunities"]
 
     def test_all_three_domains_produce_safe_candidate_and_specialist_packet(self):
-        expected_agents = ["design-agent-v3", "illustration-agent", "software-agent"]
+        expected_agents = ["design-agent-v3", "illustration-agent", "consulting-agent"]
         for opportunity, agent in zip(self.opportunities, expected_agents):
             with self.subTest(opportunity=opportunity["title"]):
                 before = deepcopy(opportunity)
