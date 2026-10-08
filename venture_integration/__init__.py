@@ -140,11 +140,20 @@ class VentureCoreJournal:
         self,
         list_memory: Callable[[str, str], list[Mapping[str, Any]]],
         add_memory: Callable[[dict[str, Any]], Mapping[str, Any]],
+        *,
+        single_writer_mode: bool = False,
     ):
+        # Legacy adapter is only for controlled single-writer fixtures.
+        # Production must use CoreMemoryHttpAdapter.append_atomic instead.
+        self._single_writer_mode = single_writer_mode
         self._list_memory = list_memory
         self._add_memory = add_memory
 
     def append(self, record: Mapping[str, Any]) -> dict[str, Any]:
+        if not self._single_writer_mode:
+            raise VentureRecordError(
+                "Non-atomic journal is disabled: use the Core revision endpoint"
+            )
         obj = validate(record)
         ref = obj["venture_ref"]
         history = extract_snapshots(self._list_memory(KIND, ref), ref)
