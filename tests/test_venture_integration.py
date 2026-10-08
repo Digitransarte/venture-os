@@ -30,6 +30,13 @@ class VentureIntegrationTests(unittest.TestCase):
     def setUp(self):
         self.record = json.loads(FIXTURE.read_text(encoding="utf-8"))
 
+    def test_legacy_non_atomic_adapter_fails_closed_by_default(self):
+        fake = FakeCore()
+        journal = VentureCoreJournal(fake.list_memory, fake.add_memory)
+        with self.assertRaises(VentureRecordError):
+            journal.append(self.record)
+        self.assertEqual(len(fake.memory), 0)
+
     def test_fixture_has_real_uncertainty_and_correct_state(self):
         x = validate(self.record)
         self.assertEqual(x["stage"], "exploring")
@@ -73,7 +80,7 @@ class VentureIntegrationTests(unittest.TestCase):
 
     def test_snapshot_is_idempotent_and_append_only(self):
         fake = FakeCore()
-        journal = VentureCoreJournal(fake.list_memory, fake.add_memory)
+        journal = VentureCoreJournal(fake.list_memory, fake.add_memory, single_writer_mode=True)
         one = journal.append(self.record)
         again = journal.append(self.record)
         self.assertEqual(one["status"], "created")
@@ -97,12 +104,12 @@ class VentureIntegrationTests(unittest.TestCase):
             "content": json.dumps({"revision": 7, "digest": "x",
                                    "record": {"venture_ref": "VOS-OTHER"}}),
         })
-        journal = VentureCoreJournal(fake.list_memory, fake.add_memory)
+        journal = VentureCoreJournal(fake.list_memory, fake.add_memory, single_writer_mode=True)
         self.assertEqual(journal.append(self.record)["revision"], 1)
 
     def test_divergent_revisions_are_rejected(self):
         fake = FakeCore()
-        journal = VentureCoreJournal(fake.list_memory, fake.add_memory)
+        journal = VentureCoreJournal(fake.list_memory, fake.add_memory, single_writer_mode=True)
         journal.append(self.record)
         variant = deepcopy(self.record)
         variant["next_action"] = "different"
@@ -116,7 +123,7 @@ class VentureIntegrationTests(unittest.TestCase):
             journal.append(self.record)
 
     def test_proof_of_core_confirmation_required(self):
-        journal = VentureCoreJournal(lambda kind, ref: [], lambda entry: {})
+        journal = VentureCoreJournal(lambda kind, ref: [], lambda entry: {}, single_writer_mode=True)
         with self.assertRaises(VentureRecordError):
             journal.append(self.record)
 
