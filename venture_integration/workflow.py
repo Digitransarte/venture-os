@@ -23,8 +23,8 @@ SPECIALIST_ROUTES = {
         "result": "Inventory of two existing original artworks: provenance, rights, master files, print technique constraints and unresolved questions; no transformation or production",
     },
     "metal-fabrication": {
-        "target": "engineering", "agent": "software-agent",
-        "result": "Catalogue/configuration and costing requirements for representative metalwork products; manual measurement, engineering QA and fabrication gates; no fabrication",
+        "target": "companyos", "agent": "consulting-agent",
+        "result": "Review costing, client quoting and catalogue opportunities with CompanyOS/Engineering as data owners; identify measurement, engineering QA and fabrication gates; no fabrication",
     },
 }
 REF_RE = re.compile(r"^VOS-[A-Z0-9-]{4,80}$")
