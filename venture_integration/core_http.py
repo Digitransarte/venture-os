@@ -10,6 +10,7 @@ from typing import Any
 from . import KIND as SNAPSHOT_KIND, fingerprint, validate
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit
+import re
 from urllib.request import (
     HTTPRedirectHandler, HTTPSHandler, HTTPHandler, Request,
     build_opener,
@@ -30,10 +31,11 @@ class _NoRedirect(HTTPRedirectHandler):
 
 
 class CoreMemoryHttpAdapter:
-    """Small adapter for /v1/projects/{slug}/memory.
+    """Authenticated adapter for Core records and atomic Venture revisions.
 
-    Project entity must exist before using this adapter. Snapshots are
-    append-only, not atomic: concurrent writers need server-side uniqueness.
+    The caller token is global in Core v0.7.x: a project slug is NOT
+    authorization isolation. Use only as a trusted internal service until
+    scoped credentials/authorization are implemented and reviewed.
     """
 
     def __init__(self, *, base_url: str, api_token: str,
@@ -46,7 +48,7 @@ class CoreMemoryHttpAdapter:
             raise ValueError("Do not include credentials, query or fragments in URL")
         if not isinstance(api_token, str) or not api_token.strip():
             raise ValueError("Core API token is required")
-        if not project_slug or "/" in project_slug:
+        if not isinstance(project_slug, str) or not re.fullmatch(r"[a-z0-9][a-z0-9-]{1,78}[a-z0-9]", project_slug):
             raise ValueError("A valid Core project slug is required")
         if timeout < 1 or timeout > 60:
             raise ValueError("Timeout must be between 1 and 60 seconds")
@@ -99,6 +101,8 @@ class CoreMemoryHttpAdapter:
 
     def get_latest(self, venture_ref: str) -> dict | None:
         """Read the authoritative Core revision. Return None only on 404."""
+        if not isinstance(venture_ref, str) or not re.fullmatch(r"VOS-[A-Z0-9-]{4,80}", venture_ref):
+            raise CoreTransportError("Invalid Venture reference")
         endpoint = ("/v1/projects/" + quote(self.project_slug, safe="")
                     + "/venture-records/" + quote(venture_ref, safe=""))
         try:
@@ -111,6 +115,9 @@ class CoreMemoryHttpAdapter:
             raise CoreTransportError("Core returned invalid Venture Record")
         if not isinstance(value.get("record"), dict):
             raise CoreTransportError("Core returned invalid Venture content")
+        if (value["record"].get("core_project_slug") != self.project_slug
+                or value["record"].get("venture_ref") != venture_ref):
+            raise CoreTransportError("Core Venture Record identity mismatch")
         if value.get("digest") != fingerprint(value["record"]):
             raise CoreTransportError("Core Venture Record hash mismatch")
         return value
@@ -147,4 +154,9 @@ class CoreMemoryHttpAdapter:
             raise CoreTransportError("Core did not confirm matching Venture Record")
         if value.get("status") not in {"created", "unchanged"} or not value.get("memory_id"):
             raise CoreTransportError("Core did not confirm a valid journal revision")
+        if (value.get("record", {}).get("venture_ref") != obj["venture_ref"]
+                or value.get("record", {}).get("core_project_slug") != self.project_slug):
+            raise CoreTransportError("Core confirmed wrong Venture Record identity")
+        if type(value.get("revision")) is not int or value["revision"] < expected_revision:
+            raise CoreTransportError("Core confirmed invalid revision")
         return value
