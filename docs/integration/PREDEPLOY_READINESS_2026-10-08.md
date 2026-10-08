@@ -90,3 +90,16 @@ Foi construída uma **pré-visualização não versionada** em `/tmp/venture-cor
 
 **Próximo passo:** revisão do merge por humano autorizado, preservação dos commits locais de Control Board/Illustration Agent, preparação da integração num ambiente Git legítimo e nova CI integral. Não há autorização para `git push --force`, `git reset --hard`, deploy ou migração de dados.
 
+## 8. Revisão de reconciliação estática — checkpoint isolado atualizado
+
+Uma nova análise foi executada contra o commit *local* `997df41728bc365c4d081a01c43c849a2b2ab879` e a PR #30 em `9dc564e8386766abb8ae00cc9c29d411ca2ec22d`. O servidor continua a receber commits independentes, pelo que **este checkpoint não é a versão definitiva de produção**.
+
+- `git merge-tree --write-tree` voltou a encontrar **dois** conflitos textuais: `app/main.py` e `tests/test_mcp_discovery.py`.
+- Num diretório isolado não versionado `/tmp/venture-core-merge-preview-latest-20261008`, foi preservado tanto `agents` como `venture_records` e feita a união dos métodos MCP existentes com `create_project`.
+- `python3 -m compileall` terminou sem erros em `app/` e `tests/`; a análise AST confirmou registo único das duas rotas, presença de oito métodos MCP críticos e ausência de marcadores de conflito. O snapshot continha 60 ficheiros Python.
+- Sete verificações estáticas adicionais passaram: definição única da política de acesso Venture, implementação única do `create_project`, preservação do handoff de agentes, implementação única do endpoint de revisão, proteção da escrita de memória genérica, autenticação por projeto e dependências de leitura/escrita em endpoints Venture.
+- Foi produzido **exclusivamente no servidor** o patch de resolução dos dois conflitos, `/tmp/venture-core-pr30-conflicts-only-20261008.patch` (1 571 bytes; SHA-256 `7a7cd2dd91cceb98f5b9a689896a3fb37950f4c7ae80348b0a0db2064a1ac1d8`) e um manifesto de verificação `/tmp/venture-core-pr30-review-manifest-20261008.txt`. Não contém cópia integral dos 41+ commits inéditos nem foi publicado em GitHub. Os ficheiros `/tmp` podem ser eliminados pelo sistema; não são backups duradouros.
+
+**Limite essencial:** não foram executados testes funcionais ou integração contínua desta combinação; a execução local correspondente foi bloqueada por verificação de segurança e não foi contornada. Não houve novo merge, push, alteração da `main` operacional ou deploy. Antes de produção, uma pessoa autorizada terá de preservar/rever os commits locais, reconciliar numa branch apropriada e executar a CI completa, incluindo HTTP E2E em SQLite e PostgreSQL.
+
+
