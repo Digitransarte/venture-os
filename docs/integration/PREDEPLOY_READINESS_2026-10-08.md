@@ -74,3 +74,19 @@ Por isso, a hipótese anterior de uma integração sem conflitos relevantes deix
 
 **Estado do Gate:** código Venture OS integrado, Core candidate CI historicamente verde, restore local confirmado, mas **merge e deploy suspensos** por divergência significativa do repositório do servidor. Não ativar Venture OS nem alterar projetos clientes.
 
+## 7. Reconciliação dos dois conflitos (preview não persistido em Git)
+
+Em 2026-10-08, numa cópia isolada do código do servidor (commit de referência `73ac21674482718af9bd0cf263af773f5c49490f`), foi executado um ensaio de `git merge-tree --write-tree` com a PR Core #30 (`9dc564e8386766abb8ae00cc9c29d411ca2ec22d`). Este comando não fundiu branches nem alterou o Git operacional.
+
+**Resultado:** dois conflitos de conteúdo, em `app/main.py` e `tests/test_mcp_discovery.py`.
+
+- `app/main.py`: o import da lista de routers deverá incluir **ambos** `agents` (Project Agent presente no servidor) e `venture_records` (PR Core); os `app.include_router` correspondentes já estavam presentes no resultado automático.
+- `tests/test_mcp_discovery.py`: o teste deverá incluir `create_project` da PR sem perder ferramentas do servidor (`list_agents`, `get_agent`, `route_agent`, `prepare_agent_handoff`, `get_agent_handoff`, `get_project_agent_context`, `get_illustration_agent_manifest`).
+- `app/config.py` e `app/mcp_server.py`: tiveram junção automática pelo Git, mas ainda exigem revisão funcional.
+
+Foi construída uma **pré-visualização não versionada** em `/tmp/venture-core-merge-preview-20261008`, sem `.git`, resolvendo apenas esses conflitos textuais. Passou `python3 -m compileall -q` para a aplicação e os testes; não foram detetados marcadores de conflito remanescentes.
+
+**Limitação da validação:** uma tentativa de executar o teste de arranque do Core contra SQLite num contentor temporário foi **bloqueada pelas verificações de segurança da ferramenta**, e não foi repetida por via alternativa. Logo, **não temos execução de testes funcionais da versão combinada**. O teste anterior de GitHub Actions corresponde à PR não reconciliada, não a esta cópia.
+
+**Próximo passo:** revisão do merge por humano autorizado, preservação dos commits locais de Control Board/Illustration Agent, preparação da integração num ambiente Git legítimo e nova CI integral. Não há autorização para `git push --force`, `git reset --hard`, deploy ou migração de dados.
+
