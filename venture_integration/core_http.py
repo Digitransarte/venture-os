@@ -94,9 +94,18 @@ class CoreMemoryHttpAdapter:
         return value
 
     def get_project(self) -> dict:
-        value = self._request("GET", "/v1/projects/" + quote(self.project_slug, safe=""))
+        """Verify access to this project via the narrowly scoped Venture API.
+
+        The generic Core /v1/projects endpoint requires the separate global
+        admin token and intentionally cannot be called with a Venture token.
+        """
+        endpoint = ("/v1/projects/" + quote(self.project_slug, safe="")
+                    + "/venture-records/_access")
+        value = self._request("GET", endpoint)
         if not isinstance(value, dict) or value.get("slug") != self.project_slug:
-            raise CoreTransportError("Core Project mismatch")
+            raise CoreTransportError("Core Venture project access mismatch")
+        if value.get("permission") != "read" or not value.get("identity"):
+            raise CoreTransportError("Core returned invalid Venture principal")
         return value
 
     def get_latest(self, venture_ref: str) -> dict | None:
