@@ -139,6 +139,42 @@ class CoreHttpAdapterTests(unittest.TestCase):
             adapter.get_latest("VOS-PILOT-2026-001")
         self.assertEqual(error.exception.status_code, 403)
 
+    def test_project_slug_is_not_an_authorization_boundary(self):
+        with self.assertRaises(ValueError):
+            CoreMemoryHttpAdapter(
+                base_url="https://os.designeo.pt",
+                api_token="TEST_ONLY_SECRET", project_slug="../another")
+        with self.assertRaises(ValueError):
+            CoreMemoryHttpAdapter(
+                base_url="https://os.designeo.pt",
+                api_token="TEST_ONLY_SECRET", project_slug="")
+
+    def test_get_latest_rejects_cross_project_or_venture_identity(self):
+        adapter = self.make_adapter()
+        fixture = json.loads((Path(__file__).resolve().parents[1] /
+                              "docs/integration/fixtures/VOS-PILOT-2026-001.json").read_text(encoding="utf-8"))
+        outsider = dict(fixture, core_project_slug="another-project")
+        adapter._opener = Mock(open=lambda request, timeout: Response({
+            "revision": 1, "digest": fingerprint(outsider),
+            "record": outsider, "memory_id": "bad-id"}))
+        with self.assertRaises(CoreTransportError):
+            adapter.get_latest(fixture["venture_ref"])
+        adapter._opener = Mock(open=lambda request, timeout: self.fail("Invalid ref must be rejected before network"))
+        with self.assertRaises(CoreTransportError):
+            adapter.get_latest("../other-venture")
+
+    def test_append_requires_matching_server_identity(self):
+        adapter = self.make_adapter()
+        fixture = json.loads((Path(__file__).resolve().parents[1] /
+                              "docs/integration/fixtures/VOS-PILOT-2026-001.json").read_text(encoding="utf-8"))
+        malicious_reply = {
+            "revision": 1, "digest": fingerprint(fixture),
+            "record": dict(fixture, venture_ref="VOS-OTHER-VENTURE"),
+            "memory_id": "bad-id", "status": "created"}
+        adapter._opener = Mock(open=lambda request, timeout: Response(malicious_reply))
+        with self.assertRaises(CoreTransportError):
+            adapter.append_atomic(fixture, expected_revision=0, expected_digest=None)
+
     def test_http_error_message_does_not_expose_token(self):
         adapter = self.make_adapter()
         def opener(request, timeout):
