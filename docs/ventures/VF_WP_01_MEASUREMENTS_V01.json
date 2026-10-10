@@ -1,0 +1,184 @@
+{
+  "schema_version": "venture_feasibility_pilot.v0.1",
+  "pilot_ref": "VF-WP-01",
+  "opportunity_ref": "VOS-OPP-WEB-001",
+  "canonical_document": "docs/ventures/VF_WP_01_PILOT_V01.md",
+  "updated_on": "2026-10-10",
+  "status": "internal_blueprint_planned",
+  "market_validation": "not_tested",
+  "offer_proposals": [
+    {
+      "id": "digital_kit",
+      "title": "Kit Gutenberg original",
+      "buyer_hypothesis": "Profissionais e microempresas independentes de bem-estar",
+      "price_hypothesis_eur": null,
+      "price_source": null,
+      "paid_sales_evidence": 0,
+      "delivery_scope": [
+        "theme.json styles",
+        "single homepage blueprint",
+        "hero/service/CTA patterns",
+        "install instructions"
+      ],
+      "excludes": [
+        "hosting",
+        "domain",
+        "paid stock media",
+        "elementor library templates",
+        "customer-specific implementation",
+        "ongoing support"
+      ],
+      "unit_costs_eur": {
+        "payment_fees": null,
+        "distribution": null,
+        "licensing": null,
+        "per_sale_agent_cost": null,
+        "per_sale_human_labour_cost": null,
+        "acquisition_cost": null
+      },
+      "expected_delivery_hours_per_sale": null
+    },
+    {
+      "id": "kit_implementation",
+      "title": "Kit + implementação Designeo",
+      "buyer_hypothesis": "Profissionais e microempresas independentes de bem-estar",
+      "price_hypothesis_eur": null,
+      "price_source": null,
+      "paid_sales_evidence": 0,
+      "delivery_scope": [
+        "installation and theme configuration",
+        "brand adaptation",
+        "four page types as optional complete-kit scope",
+        "manual QA"
+      ],
+      "excludes": [
+        "hosting",
+        "domain",
+        "professional copywriting",
+        "new logos",
+        "third-party image rights",
+        "ongoing support unless contracted"
+      ],
+      "unit_costs_eur": {
+        "payment_fees": null,
+        "distribution": null,
+        "licensing": null,
+        "per_sale_agent_cost": null,
+        "per_sale_human_labour_cost": null,
+        "acquisition_cost": null
+      },
+      "expected_delivery_hours_per_sale": null
+    }
+  ],
+  "candidate_stack": {
+    "preferred": "WordPress block theme + Gutenberg patterns + theme.json",
+    "alternative": "Elementor for service-only variant if justified",
+    "stack_validated": false,
+    "redistribution_rights_validated": false
+  },
+  "one_off_costs_eur": {
+    "design": null,
+    "development": null,
+    "documentation": null,
+    "legal_review": null,
+    "qa": null
+  },
+  "measurement_events": [
+    {
+      "id": "M-001",
+      "activity": "Architecture and reusable pattern map",
+      "actor": "project-agent",
+      "status": "planned",
+      "estimated_minutes": null,
+      "measured_minutes": null,
+      "rework_minutes": null,
+      "cost_eur": null,
+      "cost_status": "unknown",
+      "source_ref": null,
+      "output_ref": null,
+      "notes": "Handoff preparation is not an executed specialist task"
+    },
+    {
+      "id": "M-002",
+      "activity": "Design architecture review (no final design)",
+      "actor": "design-agent-v3",
+      "status": "planned",
+      "estimated_minutes": null,
+      "measured_minutes": null,
+      "rework_minutes": null,
+      "cost_eur": null,
+      "cost_status": "unknown",
+      "source_ref": null,
+      "output_ref": null,
+      "notes": null
+    },
+    {
+      "id": "M-003",
+      "activity": "Human design/technical review",
+      "actor": "human",
+      "status": "planned",
+      "estimated_minutes": null,
+      "measured_minutes": null,
+      "rework_minutes": null,
+      "cost_eur": null,
+      "cost_status": "unknown",
+      "source_ref": null,
+      "output_ref": null,
+      "notes": null
+    },
+    {
+      "id": "M-004",
+      "activity": "Optional one-pattern Gutenberg implementation (G1 only)",
+      "actor": "developer",
+      "status": "blocked_pending_gate_1",
+      "estimated_minutes": null,
+      "measured_minutes": null,
+      "rework_minutes": null,
+      "cost_eur": null,
+      "cost_status": "unknown",
+      "source_ref": null,
+      "output_ref": null,
+      "notes": null
+    }
+  ],
+  "gates": {
+    "G0": {
+      "status": "internal_research_allowed",
+      "allowed": [
+        "internal conceptual research",
+        "drafts",
+        "estimate inputs with provenance"
+      ],
+      "blocked": [
+        "commercial publishing",
+        "customer contact",
+        "external expenses",
+        "full product production",
+        "specialist runtime without supervised handoff"
+      ]
+    },
+    "G1": {
+      "status": "pending_human_decision",
+      "proposal": "Develop one original functional Gutenberg pattern"
+    },
+    "G2": {
+      "status": "pending_human_decision",
+      "proposal": "Test buyer behaviour via approved offer and channel"
+    }
+  },
+  "incomplete_economics": true,
+  "unknowns": [
+    "verified buyer demand",
+    "credible price for each format",
+    "measured human hours",
+    "actual agent invocation cost",
+    "third-party usage and redistribution licenses",
+    "customer acquisition cost",
+    "VAT/tax and fixed overhead treatment",
+    "support burden"
+  ],
+  "external_outreach_authorized": false,
+  "purchases_authorized": false,
+  "publish_authorized": false,
+  "commercial_launch_authorized": false
+}
