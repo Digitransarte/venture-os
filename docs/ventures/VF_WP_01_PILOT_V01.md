@@ -66,3 +66,12 @@ Registar, para cada evento, `activity`, `actor`, `estimated_minutes`, `measured_
 **Próxima ação interna:** Project Agent preparar o handoff ao Design Agent v3 para entregar **apenas** a arquitetura/blueprint, mapa de padrões e estimativa de esforço com incertezas. Não gerar design final nem executar ferramentas externas nesta fase. Depois registar os minutos efetivamente consumidos e comparar a venda do kit com o serviço de implementação.
 
 **Nenhuma decisão de investimento, produto comercial ou lançamento está aprovada por este documento.**
+
+## Atualização de prioridade — 2026-10-10
+
+**Gate G1 (protótipo Hero): ADIADO.** O utilizador confirmou que um Hero é aceitável como teste técnico, mas **não** pode ultrapassar a construção da infraestrutura web própria Designeo: templates base, modelos por setor e alojamento/manutenção de websites Elementor e Gutenberg no servidor.
+
+A prioridade passou para **[Designeo Web Foundation](https://github.com/Digitransarte/websign-designeo/blob/main/docs/DESIGNEO_WEB_FOUNDATION_ROADMAP_V01.md)**, começando pela recuperação do trabalho existente em Websign/Site Studio, Designeo Lite/Elite, bhconv e DesignOS. O primeiro Hero funcional, se vier a ser construído, será um **teste de integração** do motor web Designeo Base, não uma venture autónoma. O estudo G0 e as estimativas permanecem arquivados sem se converterem em decisão de produção.
+
+O Venture OS entra posteriormente para avaliar preços, capacidade de reutilização e procura de modelos **já testados** em trabalho web Designeo. Não há aprovação para lançamento, criação de templates para revenda, contactos, gastos ou deploy por esta atualização.
+
