@@ -4,7 +4,7 @@
   "opportunity_ref": "VOS-OPP-WEB-001",
   "canonical_document": "docs/ventures/VF_WP_01_PILOT_V01.md",
   "updated_on": "2026-10-10",
-  "status": "internal_blueprint_planned",
+  "status": "G0_desk_review_prepared_not_tested",
   "market_validation": "not_tested",
   "offer_proposals": [
     {
@@ -96,7 +96,13 @@
       "cost_status": "unknown",
       "source_ref": null,
       "output_ref": null,
-      "notes": "Handoff preparation is not an executed specialist task"
+      "notes": "Handoff preparation is not an executed specialist task",
+      "planning_estimate_range_minutes": [
+        45,
+        90
+      ],
+      "planning_estimate_quality": "low_unverified",
+      "planning_estimate_source_ref": "docs/ventures/VF_WP_01_DESK_REVIEW_V02.md"
     },
     {
       "id": "M-002",
@@ -110,7 +116,13 @@
       "cost_status": "unknown",
       "source_ref": null,
       "output_ref": null,
-      "notes": null
+      "notes": "Agent runtime not executed; task scope prepared in handoff, do not mark done",
+      "planning_estimate_range_minutes": [
+        60,
+        120
+      ],
+      "planning_estimate_quality": "low_unverified",
+      "planning_estimate_source_ref": "docs/ventures/VF_WP_01_DESK_REVIEW_V02.md"
     },
     {
       "id": "M-003",
@@ -124,7 +136,13 @@
       "cost_status": "unknown",
       "source_ref": null,
       "output_ref": null,
-      "notes": null
+      "notes": null,
+      "planning_estimate_range_minutes": [
+        30,
+        75
+      ],
+      "planning_estimate_quality": "low_unverified",
+      "planning_estimate_source_ref": "docs/ventures/VF_WP_01_DESK_REVIEW_V02.md"
     },
     {
       "id": "M-004",
@@ -138,12 +156,18 @@
       "cost_status": "unknown",
       "source_ref": null,
       "output_ref": null,
-      "notes": null
+      "notes": "G1 needs human approval; 300–600 minutes estimated for one Hero incl. technical QA and 2 fictitious visual contexts",
+      "planning_estimate_range_minutes": [
+        300,
+        600
+      ],
+      "planning_estimate_quality": "low_unverified",
+      "planning_estimate_source_ref": "docs/ventures/VF_WP_01_DESK_REVIEW_V02.md"
     }
   ],
   "gates": {
     "G0": {
-      "status": "internal_research_allowed",
+      "status": "internal_desk_review_written_no_specialist_run",
       "allowed": [
         "internal conceptual research",
         "drafts",
@@ -180,5 +204,9 @@
   "external_outreach_authorized": false,
   "purchases_authorized": false,
   "publish_authorized": false,
-  "commercial_launch_authorized": false
+  "commercial_launch_authorized": false,
+  "review_ref": "docs/ventures/VF_WP_01_DESK_REVIEW_V02.md",
+  "planning_estimate_method": "qualitative desk estimates by ChatGPT, not measurement or Design Agent execution; source VF_WP_01_DESK_REVIEW_V02.md",
+  "hypothesized_primary_model": "implementation_service_using_reusable_original_patterns",
+  "hypothesized_secondary_model": "standalone_digital_kit_after_reuse_validation"
 }
