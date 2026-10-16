@@ -90,7 +90,7 @@ def card(item):
     )
     if st.button("Abrir no Workspace →", key="open_" + item["id"], use_container_width=True):
         st.session_state["selected"] = item["id"]
-        st.session_state["section"] = "Workspace"
+        st.session_state["nav_requested"] = "Workspace"
         st.rerun()
 
 
@@ -147,6 +147,10 @@ st.sidebar.markdown("### ◈ DESIGNEO")
 st.sidebar.caption("VENTURE OS · WORKSPACE")
 if "section" not in st.session_state:
     st.session_state["section"] = "Board"
+# Switch pages only *before* the navigation widget is instantiated.
+requested_page = st.session_state.pop("nav_requested", None)
+if requested_page in ("Board", "Workspace", "Experiências", "SaaS Core"):
+    st.session_state["section"] = requested_page
 section = st.sidebar.radio(
     "Navegação", ["Board", "Workspace", "Experiências", "SaaS Core"],
     key="section", label_visibility="collapsed",
