@@ -17,7 +17,7 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from venture_workspace.core_store import CoreStateStore, WorkspaceError, summary
 
-st.set_page_config(page_title="Venture OS · Designeo", page_icon="◈", layout="wide",
+st.set_page_config(page_title="Venture OS · Designeo", page_icon="💡", layout="wide",
                    initial_sidebar_state="expanded")
 
 st.markdown("""
@@ -85,7 +85,7 @@ def card(item):
     st.markdown(
         f'<div class="v-card"><div class="v-meta">{cid}</div>'
         f'<strong>{title}</strong><span class="v-pill">{stage}</span>'
-        f'<p>{problem[:210]}</p><small>Sem validação comercial confirmada</small></div>',
+        f'<p>{problem[:210]}</p><small>{("Validação comercial confirmada" if item.get("business_validated") is True else "Sem validação comercial confirmada")}</small></div>',
         unsafe_allow_html=True,
     )
     if st.button("Abrir no Workspace →", key="open_" + item["id"], use_container_width=True):
