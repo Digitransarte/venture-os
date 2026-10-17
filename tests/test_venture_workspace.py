@@ -1,8 +1,15 @@
-"""Regression tests for the internal Venture Workspace data contract."""
+"""Regressions for the read-only Venture Workspace / Designeo Core contract.
+
+HTTP calls are deliberately mocked: no live Core secrets or endpoints are used.
+"""
+import json
 import unittest
+from unittest.mock import Mock
+from urllib.error import URLError
 
 from venture_workspace.core_store import (
-    CoreStateStore, WorkspaceError, parse_candidates, patch_candidate, summary,
+    CoreStateStore, ENDPOINT, MAX_RESPONSE_BYTES,
+    WorkspaceError, parse_candidates, summary,
 )
 
 BASE = {
@@ -12,86 +19,111 @@ BASE = {
     "source": "test", "confidence": None,
     "value": {
         "schema": "designeo.venture.candidate.v0.1",
-        "id": "VF-DEMO-01", "name": "Demo", "stage": "G0_discovery",
-        "problem": "Initial hypothesis", "business_validated": False,
+        "id": "VF-DEMO-01", "name": "Synthetic project",
+        "stage": "G0_discovery", "problem": "Initial hypothesis",
         "experiments": [{"name": "Interview", "status": "planned"}],
+        "business_validated": False,
+    },
+}
+SECOND = {
+    **BASE, "key": "candidate:VF-TEST-02",
+    "value": {
+        **BASE["value"], "id": "VF-TEST-02", "name": "Another synthetic project",
+        "experiments": [],
     },
 }
 
 
+class FakeResponse:
+    def __init__(self, payload):
+        self.content = payload
+    def __enter__(self):
+        return self
+    def __exit__(self, *args):
+        pass
+    def read(self, count):
+        return self.content[:count]
+
+
 class WorkspaceCoreTests(unittest.TestCase):
-    def test_parsing_only_canonical_candidates(self):
+    def test_canonical_two_candidate_board(self):
         unrelated = {**BASE, "scope": "other"}
         broken = {**BASE, "key": "candidate:VF-OTHER-01"}
-        results = parse_candidates([BASE, unrelated, broken])
-        self.assertEqual(len(results), 1)
-        self.assertEqual(results[0]["id"], "VF-DEMO-01")
-        self.assertIn("_updated_at", results[0])
+        results = parse_candidates([BASE, SECOND, unrelated, broken])
+        self.assertEqual([x["id"] for x in results], ["VF-TEST-02", "VF-DEMO-01"])
+        self.assertEqual(summary(results), {
+            "total": 2, "in_discovery": 2,
+            "pending_experiments": 1, "validation_claims": 0,
+        })
 
-    def test_summary_does_not_claim_validation(self):
-        result = summary(parse_candidates([BASE]))
-        self.assertEqual(result["total"], 1)
-        self.assertEqual(result["in_discovery"], 1)
-        self.assertEqual(result["pending_experiments"], 1)
-        self.assertEqual(result["validated_businesses"], 0)
+    def test_no_false_market_validation(self):
+        reported = {**BASE, "value": {**BASE["value"], "business_validated": True}}
+        self.assertEqual(summary(parse_candidates([reported]))["validation_claims"], 1)
 
-    def test_editor_preserves_state_and_original(self):
-        original = parse_candidates([BASE])[0]
-        updated = patch_candidate(original, {"problem": "New hypothesis"})
-        self.assertEqual(updated["problem"], "New hypothesis")
-        self.assertEqual(updated["stage"], "G0_discovery")
-        self.assertFalse(updated["business_validated"])
-        self.assertNotIn("_updated_at", updated)
-        self.assertEqual(original["problem"], "Initial hypothesis")
+    def test_reject_duplicate_id(self):
+        with self.assertRaisesRegex(WorkspaceError, "Duplicate"):
+            parse_candidates([BASE, BASE])
 
-    def test_editor_rejects_external_approvals(self):
-        original = parse_candidates([BASE])[0]
-        for forbidden in ("stage", "decision", "business_validated", "gate", "evidence", "id", "experiments"):
-            with self.subTest(forbidden=forbidden), self.assertRaises(WorkspaceError):
-                patch_candidate(original, {forbidden: "approved"})
+    def test_reject_wrong_shapes(self):
+        for value in (
+            {**BASE["value"], "name": {"text": "invalid"}},
+            {**BASE["value"], "stage": None},
+            {**BASE["value"], "experiments": "planned"},
+            {**BASE["value"], "hypotheses": "invalid"},
+            {**BASE["value"], "metrics": "invalid"},
+        ):
+            with self.subTest(value=value), self.assertRaises(WorkspaceError):
+                parse_candidates([{**BASE, "value": value}])
 
-    def test_editor_caps_user_content(self):
-        with self.assertRaises(WorkspaceError):
-            patch_candidate(BASE["value"], {"notes": "x" * 3001})
+    def test_invalid_core_url(self):
+        invalid = (
+            "http://example.com", "ftp://example.com",
+            "https://user:pass@core.example.com",
+            "https://core.example.com/base",
+            "https://core.example.com?key=secret",
+            "https://core.example.com#fragment",
+        )
+        for address in invalid:
+            with self.subTest(address=address), self.assertRaises(WorkspaceError):
+                CoreStateStore(address, "testing-only-token")
 
-    def test_store_rejects_unsafe_base_url(self):
-        for bad in ("http://example.com", "ftp://example.com", "https://user:pass@example.com", "https://example.com?a=b"):
-            with self.subTest(url=bad), self.assertRaises(WorkspaceError):
-                CoreStateStore(bad, "not-a-real-token")
+    def test_core_get_only_scoped_and_bearer_server_side(self):
+        store = CoreStateStore("https://internal.core.example", "testing-only-token")
+        requests = []
+        def fake_open(req, timeout=0):
+            requests.append(req)
+            return FakeResponse(json.dumps([BASE, SECOND]).encode("utf-8"))
+        store._opener = Mock(open=fake_open)
+        items = store.list_candidates()
+        self.assertEqual(len(items), 2)
+        self.assertEqual(len(requests), 1)
+        self.assertEqual(requests[0].get_method(), "GET")
+        self.assertEqual(requests[0].full_url, "https://internal.core.example" + ENDPOINT)
+        self.assertEqual(requests[0].get_header("Authorization"), "Bearer testing-only-token")
+        self.assertNotIn("testing-only-token", repr(items))
+        self.assertNotIn("testing-only-token", requests[0].full_url)
 
-    def test_default_write_locked(self):
-        store = CoreStateStore("https://core.example.com", "mock")
-        store._request = lambda *args: self.fail("Network should not be called")
+    def test_writes_unconditionally_disabled(self):
+        store = CoreStateStore("https://internal.core.example", "test-token")
+        store._opener = Mock(open=Mock(side_effect=AssertionError("Network must not be reached")))
         with self.assertRaisesRegex(WorkspaceError, "disabled"):
-            store.update_candidate("VF-DEMO-01", BASE["updated_at"], {"notes": "x"})
+            store.update_candidate("VF-DEMO-01", "old", {"notes": "new"})
+        store._opener.open.assert_not_called()
 
-    def test_optimistic_stale_version_refusal(self):
-        store = CoreStateStore("https://core.example.com", "mock", allow_legacy_writes=True)
-        calls = []
-        def fake_request(method, path, body=None):
-            calls.append(method)
-            if method == "GET":
-                return [BASE]
-            self.fail("Must not PUT on stale revision")
-        store._request = fake_request
-        with self.assertRaisesRegex(WorkspaceError, "changed"):
-            store.update_candidate("VF-DEMO-01", "stale", {"notes": "x"})
-        self.assertEqual(calls, ["GET"])
+    def test_invalid_http_response_and_size_limit(self):
+        store = CoreStateStore("https://internal.core.example", "test-token")
+        for raw in (b"not JSON", b"{}", b"[" + b"x" * MAX_RESPONSE_BYTES + b"]"):
+            store._opener = Mock(open=lambda req, timeout=0: FakeResponse(raw))
+            with self.subTest(size=len(raw)), self.assertRaises(WorkspaceError):
+                store.list_candidates()
 
-    def test_allowed_update_sends_preserved_candidate_to_core(self):
-        store = CoreStateStore("https://core.example.com", "mock", allow_legacy_writes=True)
-        calls = []
-        def fake_request(method, path, body=None):
-            calls.append((method, path, body))
-            if method == "GET":
-                return [BASE]
-            return {"value": body["value"], "updated_at": "next"}
-        store._request = fake_request
-        value = store.update_candidate("VF-DEMO-01", BASE["updated_at"], {"notes": "research"})
-        self.assertEqual(value["value"]["notes"], "research")
-        self.assertEqual(calls[1][0], "PUT")
-        self.assertIn("candidate%3AVF-DEMO-01", calls[1][1])
-        self.assertFalse(calls[1][2]["value"]["business_validated"])
+    def test_error_never_exposes_bearer(self):
+        store = CoreStateStore("https://internal.core.example", "SECRET-TOKEN-NEVER-LOG")
+        store._opener = Mock(open=Mock(side_effect=URLError("some internal transport error")))
+        with self.assertRaises(WorkspaceError) as cm:
+            store.list_candidates()
+        self.assertNotIn("SECRET-TOKEN-NEVER-LOG", str(cm.exception))
+        self.assertNotIn("internal transport error", str(cm.exception))
 
 
 if __name__ == "__main__":
