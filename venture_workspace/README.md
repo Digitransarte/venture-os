@@ -44,6 +44,32 @@ Start the app bound to \`127.0.0.1\`. If a web proxy is later used, require
 HTTPS, a private access boundary and explicit deployment approval. The simple
 internal password is **not** tenant-level authorization or an SSO substitute.
 
+## SaaS viability scenarios (new)
+
+The **Viabilidade SaaS** page is a cross-candidate what-if calculator, not a
+revenue tracker. It accepts user-defined, EUR-denominated, VAT-exclusive inputs
+for paying accounts, price, AI call counts and input/output token sizes,
+provider rates, other AI tools, storage, support, payment processing, hosting,
+backups and additional fixed costs. It calculates monthly recurring revenue,
+variable and fixed expenses, per-account contribution and break-even.
+
+**Never** default provider pricing to a stale constant, misrepresent missing
+cost inputs as free services, or combine USD price lists with EUR scenarios
+without explicit conversion. At this stage there is no billing integration,
+no recording of production usage, no automatic ROI prediction and no
+commercial deployment approval. Comparisons should document evidence sources.
+
+The Venture Factory distinguishes three product modes:
+1. **Internal ChatGPT-assisted** — private/human-supervised pilot.
+2. **Hybrid pilot** — independent, metered API only for high-value tasks.
+3. **Public SaaS** — independently hosted operation, permissions, billing,
+   support, privacy, backup and validated unit economics.
+
+Learning OS remains an internal learning prototype until data isolation,
+consent for minors, recovery and usability gates have been completed. Its
+study-session and review functions should not require an AI call when a
+deterministic application feature can do the job.
+
 ## Edit safety
 
 - Default: read-only.
