@@ -19,6 +19,8 @@ jobs:
           python-version: "3.12"
       - name: Compile adapter
         run: python -m compileall -q venture_integration
+      - name: Check Venture Workspace Python syntax
+        run: python -m compileall -q venture_workspace
       - name: Run legacy documentation and integration tests
         run: python -m unittest discover -s tests -v
       - name: Generate internal opportunity discovery report
