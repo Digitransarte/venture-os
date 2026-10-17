@@ -133,6 +133,10 @@ if demo:
         "_updated_at": "demo",
     }]
 else:
+    if os.getenv("VENTURE_WORKSPACE_ENABLE_LIVE_READ", "") != "1":
+        st.error("Ligação ao Core desativada. É necessária ativação explícita para consultar dados reais.")
+        st.info("Para testes sem credenciais, utiliza VENTURE_WORKSPACE_DEMO=1. Não existe acesso externo autorizado por esta opção.")
+        st.stop()
     try:
         store = core_store()
         candidates = store.list_candidates()
