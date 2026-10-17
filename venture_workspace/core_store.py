@@ -1,7 +1,7 @@
-"""Private internal Venture Workspace data adapter.
+"""Server-side, read-only Designeo OS Core adapter for Venture Workspace.
 
-The Designeo OS Core remains the source of truth. No local candidate database,
-no token in browser code, and no public/multitenant authentication contract.
+Core state is the canonical source. This adapter cannot write, approve gates,
+execute actions or authenticate clients. No credentials are exposed to the UI.
 """
 from __future__ import annotations
 
@@ -9,18 +9,18 @@ import json
 import re
 from copy import deepcopy
 from urllib.error import HTTPError, URLError
-from urllib.parse import quote, urlsplit
+from urllib.parse import urlsplit
 from urllib.request import HTTPRedirectHandler, HTTPSHandler, HTTPHandler, Request, build_opener
 
 SCOPE = "venture-factory"
 SCHEMA = "designeo.venture.candidate.v0.1"
+ENDPOINT = "/v1/system/state?scope=venture-factory"
 ID_RE = re.compile(r"^VF-[A-Z0-9-]{3,64}$")
-EDITABLE = frozenset({"problem", "value_proposition", "next_action", "notes"})
-MAX_TEXT = 3000
+MAX_RESPONSE_BYTES = 1_000_000
 
 
 class WorkspaceError(ValueError):
-    pass
+    """Safe operational error; never attach HTTP bodies or credentials."""
 
 
 class _NoRedirect(HTTPRedirectHandler):
@@ -29,46 +29,54 @@ class _NoRedirect(HTTPRedirectHandler):
 
 
 def parse_candidates(rows: list[dict]) -> list[dict]:
-    """Read Core system_state candidate records; ignore unrelated records."""
-    output = []
+    """Select canonical candidates; reject duplicate IDs and malformed UI fields.
+
+    A source's validation claim is kept as *reported state*, never presented as
+    independently verified business validation. No type is silently coerced.
+    """
+    if not isinstance(rows, list):
+        raise WorkspaceError("Core returned an invalid candidate list")
+    results: list[dict] = []
+    ids = set()
     for item in rows:
         if not isinstance(item, dict) or item.get("scope") != SCOPE:
             continue
         value = item.get("value")
-        key = item.get("key", "")
+        key = item.get("key")
         if not isinstance(value, dict) or not isinstance(key, str):
             continue
         if value.get("schema") != SCHEMA:
             continue
-        candidate_id = value.get("id")
-        if not isinstance(candidate_id, str) or not ID_RE.fullmatch(candidate_id):
+        cid = value.get("id")
+        if not isinstance(cid, str) or not ID_RE.fullmatch(cid) or key != "candidate:" + cid:
             continue
-        if key != "candidate:" + candidate_id:
-            continue
-        output.append({**deepcopy(value), "_updated_at": item.get("updated_at", "")})
-    return sorted(output, key=lambda item: (item.get("name", "").casefold(), item["id"]))
-
-
-def patch_candidate(original: dict, patch: dict) -> dict:
-    """Allow editing text hypotheses only; never grant gates or market validation."""
-    if not isinstance(original, dict) or original.get("schema") != SCHEMA:
-        raise WorkspaceError("Invalid candidate")
-    if not isinstance(patch, dict) or not patch or set(patch) - EDITABLE:
-        raise WorkspaceError("Only non-authorizing descriptive fields may be edited")
-    candidate = deepcopy(original)
-    candidate.pop("_updated_at", None)
-    for key, value in patch.items():
-        if not isinstance(value, str) or len(value) > MAX_TEXT:
-            raise WorkspaceError(f"Invalid text for {key}")
-        candidate[key] = value.strip()
-    return candidate
+        if cid in ids:
+            raise WorkspaceError("Duplicate canonical candidate ID returned by Core")
+        for name in ("name", "stage", "problem", "value_proposition"):
+            if name in value and (not isinstance(value[name], str) or len(value[name]) > 3000):
+                raise WorkspaceError("Candidate contains an invalid descriptive field")
+        for name in ("customer_segments", "hypotheses", "risks"):
+            vals = value.get(name, [])
+            if not isinstance(vals, list) or len(vals) > 100 or any(
+                    not isinstance(v, str) or len(v) > 3000 for v in vals):
+                raise WorkspaceError("Candidate contains an invalid collection")
+        if not isinstance(value.get("experiments", []), list):
+            raise WorkspaceError("Candidate contains invalid experiments")
+        if not isinstance(value.get("metrics", {}), dict) or not isinstance(value.get("costs", {}), dict):
+            raise WorkspaceError("Candidate contains invalid metrics")
+        ids.add(cid)
+        v = deepcopy(value)
+        v["_updated_at"] = item.get("updated_at", "")
+        results.append(v)
+    return sorted(results, key=lambda x: (x.get("name", "").casefold(), x["id"]))
 
 
 def summary(candidates: list[dict]) -> dict:
+    """Aggregate discovery status, not unverifiable commercial achievements."""
     return {
         "total": len(candidates),
         "in_discovery": sum(c.get("stage", "").startswith("G0") for c in candidates),
-        "validated_businesses": sum(c.get("business_validated") is True for c in candidates),
+        "validation_claims": sum(c.get("business_validated") is True for c in candidates),
         "pending_experiments": sum(
             e.get("status") in ("planned", "not_started", "blocked_security_gate")
             for c in candidates for e in c.get("experiments", [])
@@ -78,69 +86,51 @@ def summary(candidates: list[dict]) -> dict:
 
 
 class CoreStateStore:
-    """Server-only trusted Core transport. Never expose Core token to a browser.
+    """Read-only internal transport; works with trusted server-only credentials.
 
-    The existing Core /system/state PUT is *not* atomic compare-and-swap:
-    writes are disabled by default, require a single trusted admin, and must
-    migrate to Venture revisions before multi-editor use.
+    Core's current global Bearer credential is NOT project-scoped authorization.
+    Keep this behind a private network boundary. No write endpoint is invoked.
     """
 
-    def __init__(self, base_url: str, token: str, *, allow_legacy_writes: bool = False):
-        url = urlsplit(base_url)
-        local = url.scheme == "http" and url.hostname in {"127.0.0.1", "localhost", "::1"}
-        if not ((url.scheme == "https" or local) and url.hostname):
+    def __init__(self, base_url: str, token: str):
+        if not isinstance(base_url, str) or not isinstance(token, str):
+            raise WorkspaceError("Core configuration is incomplete")
+        parts = urlsplit(base_url)
+        is_loopback = parts.scheme == "http" and parts.hostname in {
+            "localhost", "127.0.0.1", "::1"
+        }
+        if not ((parts.scheme == "https" or is_loopback) and parts.hostname):
             raise WorkspaceError("Core address must use HTTPS or loopback")
-        if url.username or url.password or url.query or url.fragment:
-            raise WorkspaceError("Credentials or URL query are forbidden")
-        if not token or not isinstance(token, str):
-            raise WorkspaceError("Server-only Core token required")
+        if (parts.username or parts.password or parts.query or parts.fragment
+                or parts.path not in ("", "/")):
+            raise WorkspaceError("Core base URL cannot contain credentials, paths or queries")
+        if not token.strip() or "\n" in token or "\r" in token:
+            raise WorkspaceError("Valid server-only Core token is required")
         self.base = base_url.rstrip("/")
-        self.token = token
-        self.allow_legacy_writes = allow_legacy_writes
-        self.opener = build_opener(_NoRedirect(), HTTPSHandler(), HTTPHandler())
-
-    def _request(self, method: str, path: str, body: dict | None = None):
-        payload = json.dumps(body, ensure_ascii=False).encode() if body is not None else None
-        headers = {"Authorization": "Bearer " + self.token, "Accept": "application/json"}
-        if payload is not None:
-            headers["Content-Type"] = "application/json"
-        request = Request(self.base + path, data=payload, method=method, headers=headers)
-        try:
-            with self.opener.open(request, timeout=8) as response:
-                return json.loads(response.read().decode("utf-8"))
-        except HTTPError as err:
-            raise WorkspaceError(f"Core returned HTTP {err.code}") from None
-        except URLError:
-            raise WorkspaceError("Core unavailable") from None
-        except (UnicodeError, ValueError):
-            raise WorkspaceError("Core returned invalid JSON") from None
+        self._token = token
+        self._opener = build_opener(_NoRedirect(), HTTPSHandler(), HTTPHandler())
 
     def list_candidates(self) -> list[dict]:
-        result = self._request("GET", "/v1/system/state?scope=" + SCOPE)
-        if not isinstance(result, list):
-            raise WorkspaceError("Core returned invalid candidate listing")
-        return parse_candidates(result)
+        """One allowlisted GET, bounded response, no fallback or broad Core listing."""
+        request = Request(self.base + ENDPOINT,
+                          method="GET",
+                          headers={"Authorization": "Bearer " + self._token,
+                                   "Accept": "application/json"})
+        try:
+            with self._opener.open(request, timeout=8) as response:
+                content = response.read(MAX_RESPONSE_BYTES + 1)
+        except HTTPError as exc:
+            raise WorkspaceError(f"Core returned HTTP {exc.code}") from None
+        except URLError:
+            raise WorkspaceError("Core unavailable") from None
+        if len(content) > MAX_RESPONSE_BYTES:
+            raise WorkspaceError("Core candidate response exceeds size limit")
+        try:
+            payload = json.loads(content.decode("utf-8"))
+        except (UnicodeError, ValueError):
+            raise WorkspaceError("Core returned invalid JSON") from None
+        return parse_candidates(payload)
 
-    def update_candidate(self, candidate_id: str, expected_updated_at: str, patch: dict) -> dict:
-        if not self.allow_legacy_writes:
-            raise WorkspaceError("Workspace writes disabled pending reviewed Core revision API")
-        if not ID_RE.fullmatch(candidate_id or "") or not expected_updated_at:
-            raise WorkspaceError("Candidate identity and version are required")
-        # Single-admin read-before-write check is a safeguard, NOT atomic CAS.
-        listing = self._request("GET", "/v1/system/state?scope=" + SCOPE)
-        row = next((x for x in listing if x.get("key") == "candidate:" + candidate_id
-                    and x.get("scope") == SCOPE), None)
-        if not row or row.get("updated_at") != expected_updated_at:
-            raise WorkspaceError("Candidate changed: refresh before editing")
-        changed = patch_candidate(row["value"], patch)
-        path = "/v1/system/state/" + SCOPE + "/" + quote("candidate:" + candidate_id, safe="")
-        response = self._request("PUT", path, {
-            "value": changed,
-            "state_type": row.get("state_type", "venture_candidate"),
-            "provenance": "declared",
-            "source": "venture-workspace-v0.1; internal admin edit",
-            "confidence": row.get("confidence"),
-        })
-        if not isinstance(response, dict) or response.get("value", {}).get("id") != candidate_id:
-            raise WorkspaceError("Core did not confirm updated candidate")
-        return response
+    def update_candidate(self, *args, **kwargs):
+        """Explicitly disabled pending a reviewed atomic revision API."""
+        raise WorkspaceError("Workspace writes are disabled until Core revisions are approved")
