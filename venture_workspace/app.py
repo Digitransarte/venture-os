@@ -149,10 +149,10 @@ if "section" not in st.session_state:
     st.session_state["section"] = "Board"
 # Switch pages only *before* the navigation widget is instantiated.
 requested_page = st.session_state.pop("nav_requested", None)
-if requested_page in ("Board", "Workspace", "Experiências", "Viabilidade SaaS", "SaaS Core"):
+if requested_page in ("Board", "Workspace", "Experiências", "Consumo IA", "Viabilidade SaaS", "SaaS Core"):
     st.session_state["section"] = requested_page
 section = st.sidebar.radio(
-    "Navegação", ["Board", "Workspace", "Experiências", "Viabilidade SaaS", "SaaS Core"],
+    "Navegação", ["Board", "Workspace", "Experiências", "Consumo IA", "Viabilidade SaaS", "SaaS Core"],
     key="section", label_visibility="collapsed",
 )
 st.sidebar.divider()
@@ -284,6 +284,10 @@ elif section == "Experiências":
                 st.caption("Consultar o Workspace para o contexto completo da hipótese.")
     if not total:
         st.info("Nenhuma experiência registada.")
+
+elif section == "Consumo IA":
+    from venture_workspace.usage_ui import render_usage
+    render_usage()
 
 elif section == "Viabilidade SaaS":
     from venture_workspace.economics_ui import render_economics
