@@ -59,14 +59,14 @@ def render_usage() -> None:
                 requests = st.number_input("Chamadas agregadas", min_value=0, max_value=1000000000, step=1)
                 input_tokens = st.number_input("Tokens de entrada (total)", min_value=0, max_value=1000000000000, step=1)
                 output_tokens = st.number_input("Tokens de saída (total)", min_value=0, max_value=1000000000000, step=1)
-            have_cost = st.checkbox("Conheço o custo faturado/estimado em EUR para este conjunto")
-            cost = st.number_input("Custo deste conjunto (€)", min_value=0.0, value=0.0, step=0.01, disabled=not have_cost)
+            cost = st.text_input("Custo do conjunto em EUR (vazio = desconhecido)", value="", max_chars=30,
+                                 placeholder="ex.: 0.15")
             submit = st.form_submit_button("Adicionar à sessão", type="primary")
             if submit:
                 raw = dict(month=month, app=app, operation=operation, provider=provider.strip().lower(),
                            model=model.strip().lower(), source_kind=source, requests=requests,
                            input_tokens=input_tokens, output_tokens=output_tokens,
-                           cost_eur=str(cost) if have_cost else None)
+                           cost_eur=cost.strip() if cost.strip() else None
                 try:
                     entry = parse_usage(raw)
                 except UsageError as exc:
