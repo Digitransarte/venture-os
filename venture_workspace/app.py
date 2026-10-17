@@ -85,7 +85,7 @@ def card(item):
     st.markdown(
         f'<div class="v-card"><div class="v-meta">{cid}</div>'
         f'<strong>{title}</strong><span class="v-pill">{stage}</span>'
-        f'<p>{problem[:210]}</p><small>{("Validação comercial confirmada" if item.get("business_validated") is True else "Sem validação comercial confirmada")}</small></div>',
+        f'<p>{problem[:210]}</p><small>{("Validação declarada — por verificar" if item.get("business_validated") is True else "Sem validação comercial confirmada")}</small></div>',
         unsafe_allow_html=True,
     )
     if st.button("Abrir no Workspace →", key="open_" + item["id"], use_container_width=True):
@@ -109,14 +109,12 @@ def labeled_value(title, value, empty="Por definir"):
 
 access_gate()
 demo = os.getenv("VENTURE_WORKSPACE_DEMO", "") == "1"
-writes = os.getenv("VENTURE_WORKSPACE_ENABLE_LEGACY_WRITES", "") == "1"
 
 @st.cache_resource
 def core_store():
     return CoreStateStore(
         os.getenv("DESIGNEO_CORE_URL", ""),
         os.getenv("DESIGNEO_CORE_API_TOKEN", ""),
-        allow_legacy_writes=writes,
     )
 
 store = None
@@ -158,8 +156,8 @@ section = st.sidebar.radio(
 st.sidebar.divider()
 st.sidebar.caption(f"{len(candidates)} candidatos registados")
 st.sidebar.caption("Modo demonstração" if demo else "Ligado ao Core · dados persistentes")
-if not demo and not writes:
-    st.sidebar.caption("Edição protegida · apenas leitura")
+if not demo:
+    st.sidebar.caption("Apenas leitura · protegido")
 if st.sidebar.button("Terminar sessão"):
     st.session_state.pop("venture_admin", None)
     st.rerun()
@@ -170,8 +168,8 @@ if section == "Board":
     metrics = st.columns(4)
     for col, label, value in zip(
         metrics,
-        ["Candidatos", "Em descoberta", "Experiências por realizar", "Negócios validados"],
-        [numbers["total"], numbers["in_discovery"], numbers["pending_experiments"], numbers["validated_businesses"]],
+        ["Candidatos", "Em descoberta", "Experiências por realizar", "Validações declaradas"],
+        [numbers["total"], numbers["in_discovery"], numbers["pending_experiments"], numbers["validation_claims"]],
     ):
         col.metric(label, value)
 
@@ -244,30 +242,8 @@ elif section == "Workspace":
             if isinstance(doc, str) and doc.startswith("https://github.com/"):
                 st.link_button("Consultar fonte documental", doc)
     with tabs[5]:
-        st.markdown("#### Atualizar a hipótese de negócio")
-        if demo:
-            st.info("A demonstração não guarda alterações.")
-        elif not writes:
-            st.info("Edição bloqueada enquanto a integração com revisões atómicas do Core não estiver pronta. A consulta dos registos existentes já é funcional.")
-        else:
-            st.warning("Modo interno de escritor único. A verificação de versão ainda não é transacional; não usar com vários editores.")
-            with st.form("edit_candidate"):
-                problem = st.text_area("Problema", value=item.get("problem", ""), max_chars=3000)
-                value_proposition = st.text_area("Proposta de valor", value=item.get("value_proposition", ""), max_chars=3000)
-                next_action = st.text_area("Próxima ação", value=item.get("next_action", ""), max_chars=3000)
-                notes = st.text_area("Notas de investigação", value=item.get("notes", ""), max_chars=3000)
-                submitted = st.form_submit_button("Guardar campos de investigação", type="primary")
-                if submitted:
-                    try:
-                        store.update_candidate(selected, item["_updated_at"], {
-                            "problem": problem, "value_proposition": value_proposition,
-                            "next_action": next_action, "notes": notes,
-                        })
-                    except WorkspaceError as exc:
-                        st.error(str(exc))
-                    else:
-                        st.success("Alterações guardadas no Core.")
-                        st.rerun()
+        st.info("Edição desativada: o Core atual não tem revisões atómicas autorizadas para este Workspace.")
+        st.caption("A manutenção das hipóteses e decisões continua no Core. Uma futura revisão da API irá permitir edição segura, autenticação por projeto e histórico.")
 
 elif section == "Experiências":
     intro("Validação de hipóteses", "Experiências", "Experiências planeadas e respetivo estado, sem confundir intenção com evidência.")
