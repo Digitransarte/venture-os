@@ -37,7 +37,7 @@ VENTURE_WORKSPACE_ADMIN_PASSWORD=(unique internal admin password)
 DESIGNEO_CORE_URL=(HTTPS URL or loopback to private Core)
 DESIGNEO_CORE_API_TOKEN=(server-only Core token)
 VENTURE_WORKSPACE_DEMO=0
-VENTURE_WORKSPACE_ENABLE_LEGACY_WRITES=0
+VENTURE_WORKSPACE_ENABLE_LIVE_READ=1
 \`\`\`
 
 Start the app bound to \`127.0.0.1\`. If a web proxy is later used, require
@@ -70,19 +70,26 @@ consent for minors, recovery and usability gates have been completed. Its
 study-session and review functions should not require an AI call when a
 deterministic application feature can do the job.
 
-## Edit safety
+## Read-only safety and release boundary
 
-- Default: read-only.
-- A temporary flag \`VENTURE_WORKSPACE_ENABLE_LEGACY_WRITES=1\` enables only
-  text edits (problem, value proposition, next action, notes) for one trusted
-  admin. Do **not** enable it on a public service.
-- The current Core system state PUT has **no atomic compare-and-swap**. The UI
-  checks \`updated_at\` before saving but this check is not transactional.
-- Stage changes, gates, customer evidence, validation claims, business approval
-  and external actions are **not editable** through this UI.
-- Before multi-editor or commercial usage, use reviewed Core Venture revisions
-  with CAS, project-scoped identity, an audit trail, backups and tested rollback.
-- No merge/deployment of Core PR #30 is part of this change.
+- Default after login: synthetic demo if `VENTURE_WORKSPACE_DEMO=1`. Otherwise
+  **fail closed** unless `VENTURE_WORKSPACE_ENABLE_LIVE_READ=1` is set.
+- Live Core access is server-side and uses only `GET
+  /v1/system/state?scope=venture-factory`; responses are bounded to 1 MB
+  and malformed/duplicate records are rejected.
+- The Core token remains **global admin** in the current deployed Core.
+  Therefore enable live read only after independent review of private
+  access controls; the Streamlit password alone does not create a security
+  boundary suitable for Internet users.
+- The entire candidate editor is **disabled**; no legacy Core state PUT
+  is allowed. Core PR #30 atomic revisions are not yet in production.
+- Validation claims are shown as *declared/unverified*, never converted
+  automatically to proof of market demand.
+- Do not put the token in a public container image, frontend code, Git,
+  CI logs, or Streamlit user-visible state.
+- Do not deploy, merge PR #30, or expose the Workspace to third parties
+  until scoped identity, restore drills, audited configuration and explicit
+  review/approval are complete.
 
 ## Verification
 
@@ -97,7 +104,7 @@ shipped in source or seeded again.
 
 ### Next milestones
 
-1. Confirm private Core read connectivity and render both candidates.
+1. Validate scoped private Core read with credentials issued for this service, then render both candidates.
 2. Review UX on mobile and desktop.
 3. Review/scoped-auth Core PR #30 integration and data migration contract.
 4. Implement immutable experiment/evidence journals and safe edits.
