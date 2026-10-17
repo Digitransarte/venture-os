@@ -66,7 +66,7 @@ def render_usage() -> None:
                 raw = dict(month=month, app=app, operation=operation, provider=provider.strip().lower(),
                            model=model.strip().lower(), source_kind=source, requests=requests,
                            input_tokens=input_tokens, output_tokens=output_tokens,
-                           cost_eur=cost.strip() if cost.strip() else None
+                           cost_eur=cost.strip() if cost.strip() else None)
                 try:
                     entry = parse_usage(raw)
                 except UsageError as exc:
